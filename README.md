@@ -14,6 +14,11 @@
 - 簡単に実装するためsklearnにあるものを使う
   - 精度を高めるために、BOWや正規化などの前処理は行う
 - 参考
-  - http://neuro-educator.com/ml7/
-  - https://qiita.com/asakbiz/items/73c552babd3bbca987f9
-  - https://qiita.com/fujin/items/39d450b910bf2be866b5
+  - Skleanで推定
+    - http://neuro-educator.com/ml7/
+    - https://qiita.com/asakbiz/items/73c552babd3bbca987f9
+    - https://qiita.com/fujin/items/39d450b910bf2be866b5
+  - 前処理
+    - https://note.com/shimakaze_soft/n/nf02b0f8ab0f6
+  - 形態素分析
+    - https://github.com/neologd/mecab-ipadic-neologd/blob/master/README.ja.md
