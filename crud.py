@@ -10,6 +10,9 @@ def get_feed(db: Session, feed_id: int):
 def get_feeds(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Feed).offset(skip).limit(limit).all()
 
+def get_feeds_by_url(db: Session, feed_url: str):
+    return db.query(models.Feed).filter(models.Feed.url == feed_url).first()
+
 
 def create_feed(db: Session, feed: schemas.FeedCreate):
     db_feed = models.Feed(url=feed.url, description=feed.description)
