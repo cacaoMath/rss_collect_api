@@ -11,7 +11,7 @@ class Feed(Base):
     is_active = Column(Boolean, default=True)
 
 
-class LearnigData(Base):
+class LearningData(Base):
     __tablename__ = "learning_data"
 
     id = Column(Integer, primary_key=True, index=True)
