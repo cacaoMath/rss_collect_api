@@ -1,22 +1,43 @@
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI, HTTPException
+from sqlalchemy.orm import Session
+
+import crud, models, schemas
+from database import SessionLocal, engine
+
+models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
 
-@app.get("/feeds")
-async def read_feeds():
-    return {
-        "id":   1,
-        "URL":  "https://cacaomath.com"
-    }
+# Dependency
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 
-@app.get("/feeds/{feed_id}")
-async def read_feed(feed_id: int):
-    return {
-        "id":   feed_id,
-        "URL":  "https://cacaomath.com"
-    }
+@app.get("/feeds", response_model=list[schemas.Feed])
+async def read_feeds(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    feeds = crud.get_feeds(db, skip=skip, limit=limit)
+    return feeds
+
+
+@app.get("/feeds/{feed_id}", response_model=schemas.Feed)
+async def read_feed(feed_id: int, db: Session = Depends(get_db)):
+    db_feed = crud.get_feed(db, feed_id=feed_id)
+    if db_feed is None:
+        raise HTTPException(status_code=404, detail="That's feed is not found")
+    return db_feed
+
+
+@app.post("/feeds", response_model=schemas.Feed)
+def create_feed(feed: schemas.FeedCreate, db: Session = Depends(get_db)):
+    db_feed = crud.get_feeds_by_url(db, feed_url=feed.url)
+    if db_feed:
+        raise HTTPException(status_code=400, detail="This RSS feed URL is already registered")
+    return crud.create_feed(db, feed)
 
 
 @app.get("/learning-data")
