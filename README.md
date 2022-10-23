@@ -22,3 +22,54 @@
     - https://note.com/shimakaze_soft/n/nf02b0f8ab0f6
   - 形態素分析
     - https://github.com/neologd/mecab-ipadic-neologd/blob/master/README.ja.md
+
+  - FASTAPI CRUD
+    - https://fastapi.tiangolo.com/ja/tutorial/sql-databases/#__tabbed_1_3
+
+## API
+### `feeds`
+- `/feeds/` : GET
+  - 登録しているRSS feed URLの一覧表示
+- `/feeds/{feed_id}` : GET
+  - {feed_id}のRSS feed URLの表示
+- `/feeds/` : POST
+  - RSS feed URLの登録
+
+### `learning-data`
+- `/learning-data/` : GET
+  - 学習データの一覧表示
+- `/learning-data/{data_id}` : GET
+  - {data_id}の学習データを表示
+- `/learning-data/` : POST
+  - 学習データの追加
+- `/learning-data/{data_id}` : DLETE
+  - {data_id}の学習データを削除
+
+### `classifier`
+- `/classifier` : GET
+  - モデル更新日出力
+- `/classifier/learn` : GET
+  - 分類器の更新
+
+### `rss`
+- `/rss/` : GET
+  - 分類器を使用して、ジャンル分けされた記事のタイトル、日付、URLなどをJSONで返す
+
+## Model
+### feeds
+- URL: str
+  - valid
+    - length: 255
+    - null: false
+- description : str | None
+  - valid
+    - length: 255
+### learning-data
+- word: str
+  - valid
+    - length: 255
+    - null: false
+- category: str
+  - valid
+    - length: 10
+    - null: false
