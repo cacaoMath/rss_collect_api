@@ -40,6 +40,12 @@ def create_feed(feed: schemas.FeedCreate, db: Session = Depends(get_db)):
     return crud.create_feed(db, feed)
 
 
+@app.put("/feeds/{feed_id}")
+def update_feed(feed_id: int, feed: schemas.FeedUpdate, db: Session = Depends(get_db)):
+    crud.update_feed(db, feed_id, feed)
+    return {"message": "success"}
+
+
 @app.get("/learning-data")
 async def read_all_learning_data():
     return {

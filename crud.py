@@ -23,11 +23,14 @@ def create_feed(db: Session, feed: schemas.FeedCreate):
     return db_feed
 
 
-def update_feed(db: Session, feed: schemas.FeedUpdate):
-    db_feed = models.Feed(**feed.dict())
-    db.update(db_feed)
+def update_feed(db: Session, feed_id: int, feed: schemas.FeedUpdate):
+    db_feed = db.query(models.Feed).filter(models.Feed.id == feed_id)
+    db_feed.update({
+        models.Feed.url: feed.url,
+        models.Feed.description: feed.description,
+        models.Feed.is_active: feed.is_active
+    })
     db.commit()
-    db.refresh(db_feed)
     return db_feed
 
 

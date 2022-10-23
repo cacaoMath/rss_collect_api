@@ -10,6 +10,12 @@ class FeedCreate(FeedBase):
     pass
 
 
+class FeedUpdate(FeedBase):
+    url: str
+    description: str | None = None
+    is_active: bool
+
+
 class Feed(FeedBase):
     id: int
     is_active: bool
