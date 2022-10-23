@@ -25,6 +25,8 @@
 
   - FASTAPI CRUD
     - https://fastapi.tiangolo.com/ja/tutorial/sql-databases/#__tabbed_1_3
+  - Sqalchemy
+    - https://qiita.com/petitviolet/items/e03c67794c4e335b6706
 
 ## API
 ### `feeds`
@@ -32,6 +34,10 @@
   - 登録しているRSS feed URLの一覧表示
 - `/feeds/{feed_id}` : GET
   - {feed_id}のRSS feed URLの表示
+- `/feeds/{feed_id}` : UPDATE
+  - {feed_id}のRSS feed URLの更新
+- `/feeds/{feed_id}` : DELETE
+  - {feed_id}のRSS feed URLの削除
 - `/feeds/` : POST
   - RSS feed URLの登録
 
@@ -40,16 +46,16 @@
   - 学習データの一覧表示
 - `/learning-data/{data_id}` : GET
   - {data_id}の学習データを表示
-- `/learning-data/` : POST
-  - 学習データの追加
+- `/learning-data/{data_id}` : UPDATE
+  - {data_id}の学習データを更新
 - `/learning-data/{data_id}` : DLETE
   - {data_id}の学習データを削除
+- `/learning-data/` : POST
+  - 学習データの追加
 
 ### `classifier`
 - `/classifier` : GET
   - モデル更新日出力
-- `/classifier/learn` : GET
-  - 分類器の更新
 
 ### `rss`
 - `/rss/` : GET
@@ -57,13 +63,16 @@
 
 ## Model
 ### feeds
-- URL: str
+- url: str
   - valid
     - length: 255
     - null: false
 - description : str | None
   - valid
     - length: 255
+- is_active
+  - valid
+    - default: True
 ### learning-data
 - word: str
   - valid
