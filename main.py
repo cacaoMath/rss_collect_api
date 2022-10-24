@@ -51,26 +51,19 @@ def delete_feed(feed_id: int, db: Session = Depends(get_db)):
     return crud.delete_feed(db, feed_id)
 
 
-@app.get("/learning-data")
-async def read_all_learning_data():
-    return {
-        [
-            {
-                "id": 1,
-                "word": "aaa",
-                "category": "bbb"
-            },
-        ]
-    }
+@app.get("/learning-data", response_model=list[schemas.LearningData])
+async def read_all_learning_data(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    return crud.get_all_learning_data(db, skip, limit)
 
 
-@app.get("/learning-data/{data_id}")
-async def read_learning_data(data_id: int):
-    return {
-        "id": data_id,
-        "word": "aaa",
-        "category": "bbb"
-    }
+@app.get("/learning-data/{data_id}", response_model=schemas.LearningData)
+async def read_learning_data(data_id: int, db: Session = Depends(get_db)):
+    return crud.get_learning_data(db, data_id)
+
+
+@app.post("/learning-data", response_model=schemas.LearningData)
+def create_learning_data(learning_data: schemas.LearningDataCreate, db: Session = Depends(get_db)):
+    return crud.create_learning_data(db, learning_data)
 
 
 @app.get("/calassifier")
