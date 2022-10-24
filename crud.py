@@ -34,6 +34,13 @@ def update_feed(db: Session, feed_id: int, feed: schemas.FeedUpdate):
     return db_feed
 
 
+def delete_feed(db: Session, feed_id: int):
+    db_feed = db.query(models.Feed).filter(models.Feed.id == feed_id)
+    db_feed.delete()
+    db.commit()
+    return {"message": "delete success"}
+
+
 def get_learning_data(db: Session, data_id: int):
     return db.query(models.LearningData).filter(models.LearningData.id == data_id).first()
 

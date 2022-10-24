@@ -46,6 +46,11 @@ def update_feed(feed_id: int, feed: schemas.FeedUpdate, db: Session = Depends(ge
     return {"message": "success"}
 
 
+@app.delete("/feeds/{feed_id}")
+def delete_feed(feed_id: int, db: Session = Depends(get_db)):
+    return crud.delete_feed(db, feed_id)
+
+
 @app.get("/learning-data")
 async def read_all_learning_data():
     return {
