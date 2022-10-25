@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Boolean
-from database import Base
+from db.database import Base
 
 
 class Feed(Base):
