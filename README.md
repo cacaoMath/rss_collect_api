@@ -22,8 +22,7 @@
     - https://qiita.com/fujin/items/39d450b910bf2be866b5
   - 前処理
     - https://note.com/shimakaze_soft/n/nf02b0f8ab0f6
-  - 形態素分析
-    - https://github.com/neologd/mecab-ipadic-neologd/blob/master/README.ja.md
+    - https://qiita.com/kiyuka/items/3de09e313a75248ca029
 
   - FASTAPI CRUD
     - https://fastapi.tiangolo.com/ja/tutorial/sql-databases/#__tabbed_1_3
