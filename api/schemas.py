@@ -38,3 +38,7 @@ class LearningData(LearningDataBase):
 
     class Config:
         orm_mode = True
+
+
+class PredictBase(BaseModel):
+    text: str
