@@ -61,7 +61,8 @@
 ### `classifier`
 - `/classifier` : GET
   - モデル更新日出力
-
+- `/classifier/predict` : POST
+  - テキストのジャンルを推定
 ### `rss`
 - `/rss/` : GET
   - 分類器を使用して、ジャンル分けされた記事のタイトル、日付、URLなどをJSONで返す

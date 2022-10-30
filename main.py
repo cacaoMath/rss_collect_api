@@ -77,13 +77,6 @@ async def read_classifier():
     }
 
 
-@app.get("/calassifier/learn")
-async def learn_classifier():
-    return {
-        "message": "learning..."
-    }
-
-
 @app.post("/classifier/predict")
 async def rclassifier_predict(pred: schemas.PredictBase):
     dataset = pd.read_sql_query(sql="SELECT word, category FROM learning_data", con=engine)
