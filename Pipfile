@@ -8,6 +8,9 @@ fastapi = "*"
 uvicorn = {extras = ["standard"], version = "*"}
 scikit-learn = "*"
 pandas = "*"
+sqlalchemy = "*"
+mecab-python3 = "*"
+unidic-lite = "*"
 
 [dev-packages]
 
