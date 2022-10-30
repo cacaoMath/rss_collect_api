@@ -5,7 +5,7 @@ import pandas as pd
 import pickle
 from os.path import isfile
 
-from util.ml_utils import make_van_list
+from app.util.ml_utils import make_van_list
 
 
 class Classifier:
@@ -45,20 +45,3 @@ class Classifier:
             self.classifier["Classifier"] = pickle.load(f)
 
     __load_classifier = load_classifier
-
-
-dataset = pd.read_csv("ml/test_data.csv")
-
-classifier = Classifier()
-# カテゴリを数値化
-dataset["y"], _ = pd.factorize(dataset["category"])
-dataset["word"] = dataset["word"].apply(make_van_list)
-
-classifier.train(dataset["word"], dataset["y"])
-
-pred_x1 = "今秋正式リリースの「Windows 10 バージョン 22H2」にISOイメージファイル"
-pred_x2 = "いまさら聞けないExcelの使い方講座【好評連載中！】"
-pred_x3 = "今更"
-
-
-print(classifier.predict([pred_x1, pred_x2, pred_x3]))
