@@ -2,10 +2,10 @@ from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
 import pandas as pd
 
-from api import crud, models, schemas
-from db.database import SessionLocal, engine
-from ml.classifier import Classifier
-from util.ml_utils import make_van_list
+from app.api import crud, models, schemas
+from app.db.database import SessionLocal, engine
+from app.ml.classifier import Classifier
+from app.util.ml_utils import make_van_list
 
 models.Base.metadata.create_all(bind=engine)
 
