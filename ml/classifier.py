@@ -1,34 +1,64 @@
 from sklearn.naive_bayes import MultinomialNB
-from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
+from sklearn.pipeline import Pipeline
 import pandas as pd
+import pickle
+from os.path import isfile
 
-dataset = pd.DataFrame([
-  {"word": "ジャネット・ジャクソンのMVでPCがクラッシュする脆弱性", "category": "Windows"},
-  {"word": "デスクトップ版「Outlook」に新たな問題、起動してもすぐ閉じてしまう", "category": "Windows"},
-  {"word": "Windowsパッチに問題、インストールに失敗し「0x800f0922」エラーが表示される", "category": "Windows"},
-  {"word": "Microsoft: KB5015882, KB5015814 updates break Start menu in Windows 11", "category": "Windows"},
-  {"word": "Internet Explorer/EdgeHTMLで「TLS 1.0」「TLS 1.1」がデフォルト無効化へ", "category": "Windows"},
-  {"word": "夏のゲーミングPCは熱すぎる！「MSI Afterburner」でビデオカードを省電力・低発熱に", "category": "other"},
-  {"word": "「LibreOffice 7.4 Community」が公開、スプレッドシートで16,384列まで扱えるように", "category": "other"},
-  {"word": "「Google Meet」でノイズキャンセリング量を音声インジケーターに表示可能に", "category": "other"},
-  {"word": "いまさら聞けないExcelの使い方講座【好評連載中！】", "category": "other"},
-])
+from util.ml_utils import make_van_list
 
+
+class Classifier:
+    def __init__(self) -> None:
+        self.model_path = "classifier.pickle"
+        self.classifier = Pipeline(steps=[
+            # 文字の分析はml_utilの処理に任せるのでanalyzerを指定, 英単語は大小そのまま
+            ("vec", CountVectorizer(lowercase=False, analyzer=lambda x:x)),
+            ("tfidf", TfidfTransformer()),
+            ("Classifier", MultinomialNB())
+        ])
+
+    def train(self, train_x, train_y) -> None:
+        if isfile(self.model_path):
+            self.__load_classifier
+            vec = self.classifier["vec"].fit_transform(train_x, train_y)
+            tfidf = self.classifier["tfidf"].fit(vec)
+            self.classifier["Classifier"].partial_fit(tfidf)
+        else:
+            self.classifier.fit(train_x, train_y)
+        self.__save_classifier
+
+    def predict(self, pred_x: list[str]) -> list:
+        result = self.classifier.predict(map(make_van_list, pred_x))
+        self.__save_classifier
+        return result
+
+    def save_classifier(self) -> None:
+        with open(self.model_path, mode="wb") as f:
+            pickle.dump(self.classifier["Classifier"], f)
+        print("aaaa")
+
+    __save_classifier = save_classifier
+
+    def load_classifier(self) -> None:
+        with open(self.model_path, mode="rb") as f:
+            self.classifier["Classifier"] = pickle.load(f)
+
+    __load_classifier = load_classifier
+
+
+dataset = pd.read_csv("ml/test_data.csv")
+
+classifier = Classifier()
 # カテゴリを数値化
 dataset["y"], _ = pd.factorize(dataset["category"])
+dataset["word"] = dataset["word"].apply(make_van_list)
 
-count_vectorizer = CountVectorizer()
-# csr_matrix(疎行列)が返る
-feature_vectors = count_vectorizer.fit_transform(dataset["word"])
-
-clf = MultinomialNB()
-clf.fit(feature_vectors, dataset["y"])
+classifier.train(dataset["word"], dataset["y"])
 
 pred_x1 = "今秋正式リリースの「Windows 10 バージョン 22H2」にISOイメージファイル"
 pred_x2 = "いまさら聞けないExcelの使い方講座【好評連載中！】"
+pred_x3 = "今更"
 
-result = clf.predict(count_vectorizer.transform([pred_x1]))
-print("Windows" if result == 0 else "other")
 
-result = clf.predict(count_vectorizer.transform([pred_x2]))
-print("Windows" if result == 0 else "other")
+print(classifier.predict([pred_x1, pred_x2, pred_x3]))

@@ -1,8 +1,11 @@
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
+import pandas as pd
 
 from api import crud, models, schemas
 from db.database import SessionLocal, engine
+from ml.classifier import Classifier
+from util.ml_utils import make_van_list
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -78,6 +81,22 @@ async def read_classifier():
 async def learn_classifier():
     return {
         "message": "learning..."
+    }
+
+
+@app.post("/classifier/predict")
+async def rclassifier_predict(pred: schemas.PredictBase):
+    dataset = pd.read_sql_query(sql="SELECT word, category FROM learning_data", con=engine)
+    classifier = Classifier()
+    # カテゴリを数値化
+    dataset["y"], category = pd.factorize(dataset["category"])
+    dataset["word"] = dataset["word"].apply(make_van_list)
+    classifier.train(dataset["word"], dataset["y"])
+    pred = classifier.predict([pred.text])
+    categories = category.values
+    return {
+        "pred_category": str(categories[pred[0]]),
+        "categories": str(categories)
     }
 
 
