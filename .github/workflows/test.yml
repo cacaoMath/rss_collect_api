@@ -20,7 +20,6 @@ jobs:
           echo 'eval "$(pyenv init -)"' >> ~/.bashrc
           exec "$SHELL"
           pyenv install 3.10.8
-          pyenv global 3.10.8
 
       - name: install pipenv
         run: |
@@ -47,5 +46,5 @@ jobs:
       
       - name: run test
         run: |
-          python --version
+          pyenv global 3.10.8
           pipenv run pytest
