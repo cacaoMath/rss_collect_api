@@ -1,0 +1,36 @@
+name: test
+
+on:
+  push:
+    branches:
+      - dev_ci
+
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: install pipenv
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pipenv
+      
+      - name: install mecab etc..
+        run: |
+          apt install mecab libmecab-dev mecab-ipadic-utf8 git make curl xz-utils file
+          git clone --depth 1 git@github.com:neologd/mecab-ipadic-neologd.git
+          cd mecab-ipadic-neologd
+          yes | ./bin/install-mecab-ipadic-neologd -n
+          echo `mecab-config --dicdir`"/mecab-ipadic-neologd"
+
+      
+      - name: lock package version
+        run: pipenv lock
+      
+      - name: install packages
+        run: pipenv sync --dev
+      
+      - name: run test
+        run: pipenv run test
