@@ -78,7 +78,9 @@ async def read_classifier():
 
 
 @app.post("/classifier/predict")
-async def classifier_predict(pred: schemas.PredictBase):
+async def classifier_predict(pred: schemas.PredictBase, db: Session = Depends(get_db)):
+    if db.query(models.LearningData.word).count() < 2:
+        raise HTTPException(status_code=500, detail="Learning data is small. Please input more Learning data")
     dataset = pd.read_sql_query(sql="SELECT word, category FROM learning_data", con=engine)
     classifier = Classifier()
     # カテゴリを数値化
