@@ -1,7 +1,8 @@
 import MeCab
 import re
 
-wakati = MeCab.Tagger("-Osimple -d /usr/lib/x86_64-linux-gnu/mecab/dic/mecab-ipadic-neologd")
+# wakati = MeCab.Tagger("-Osimple -d /usr/lib/x86_64-linux-gnu/mecab/dic/mecab-ipadic-neologd")
+wakati = MeCab.Tagger("-Osimple -d /opt/homebrew/lib/mecab/dic/mecab-ipadic-neologd")
 
 
 def perse_simple(text: str) -> list[list[str]]:
