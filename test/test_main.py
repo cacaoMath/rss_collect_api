@@ -104,14 +104,14 @@ def test_classifier_predict_if_learning_data_is_few(test_db):
     }
 
 
-# def test_classifier_predict_if_learning_data_is_three(test_db):
-#     data = [
-#         LearningData(word="hogehoge", category="fugafuga"),
-#         LearningData(word="hogehoge", category="fugafuga"),
-#         LearningData(word="hogehoge", category="fugafuga")
-#     ]
-#     test_db.add_all(data)
-#     test_db.flush()
-#     test_db.commit()
-#     response = client.post("/classifier/predict", json={"text": "test"})
-#     assert response.status_code == 200
+def test_classifier_predict_if_learning_data_is_three(test_db):
+    data = [
+        LearningData(word="hogehoge", category="fugafuga"),
+        LearningData(word="hogehoge", category="fugafuga"),
+        LearningData(word="hogehoge", category="fugafuga")
+    ]
+    test_db.add_all(data)
+    test_db.flush()
+    test_db.commit()
+    response = client.post("/classifier/predict", json={"text": "test"})
+    assert response.status_code == 200
