@@ -1,12 +1,14 @@
 from fastapi.testclient import TestClient
 
+from app.main import app
+from app.api.models import LearningData
 from main import app
 
 client = TestClient(app)
 
 
 def test_get_feeds_if_feed_is_none(mocker):
-    mocker.patch("main.crud.get_feeds", return_value=[])
+    mocker.patch("app.main.crud.get_feeds", return_value=[])
     response = client.get("/feeds")
     assert response.status_code == 200
     assert response.json() == []
@@ -14,7 +16,7 @@ def test_get_feeds_if_feed_is_none(mocker):
 
 def test_get_feeds_if_feed_is_one(mocker):
     mocker.patch(
-        "main.crud.get_feeds",
+        "app.main.crud.get_feeds",
         return_value=[{
               "url": "https://example.com/hoge.xml",
               "description": "hogehoge",
@@ -34,7 +36,7 @@ def test_get_feeds_if_feed_is_one(mocker):
 
 def test_get_feeds_if_feed_is_two(mocker):
     mocker.patch(
-        "main.crud.get_feeds",
+        "app.main.crud.get_feeds",
         return_value=[{
               "url": "https://example.com/hoge.xml",
               "description": "hogehoge",
@@ -66,7 +68,7 @@ def test_get_feeds_if_feed_is_two(mocker):
 
 def test_get_feed(mocker):
     mocker.patch(
-        "main.crud.get_feed",
+        "app.main.crud.get_feed",
         return_value={
             "url": "https://example.com/hoge.xml",
             "description": "hogehoge",
