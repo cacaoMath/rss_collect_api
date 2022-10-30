@@ -11,6 +11,7 @@ pandas = "*"
 sqlalchemy = "*"
 mecab-python3 = "*"
 unidic-lite = "*"
+feedparser = "*"
 
 [dev-packages]
 pytest-mock = "*"
