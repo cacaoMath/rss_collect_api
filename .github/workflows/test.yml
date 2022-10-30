@@ -20,7 +20,10 @@ jobs:
       - name: install mecab etc..
         run: |
           sudo apt install mecab libmecab-dev mecab-ipadic-utf8 git make curl xz-utils file
-          $ git clone --depth 1 https://github.com/neologd/mecab-ipadic-neologd.git
+      
+      - name: set neologd
+        run: |
+          git clone --depth 1 https://github.com/neologd/mecab-ipadic-neologd.git
           cd mecab-ipadic-neologd
           yes | ./bin/install-mecab-ipadic-neologd -n
           echo `mecab-config --dicdir`"/mecab-ipadic-neologd"
