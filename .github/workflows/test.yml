@@ -12,9 +12,15 @@ jobs:
       - name: checkout
         uses: actions/checkout@v2
 
-      - name: install python
+      - name: install python by pyenv
         run: |
-          sudo apt install python3.10.8
+          git clone git://github.com/yyuu/pyenv.git ~/.pyenv
+          echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bash_profile
+          echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bash_profile
+          echo 'eval "$(pyenv init -)"' >> ~/.bash_profile
+          source ~/.bash_profile
+          pyenv install 3.10.8
+          pyenv global 3.10.8
 
       - name: install pipenv
         run: |
