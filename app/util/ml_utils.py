@@ -1,8 +1,10 @@
 import MeCab
 import re
+from dotenv import load_dotenv
+import os
 
-# wakati = MeCab.Tagger("-Osimple -d /usr/lib/x86_64-linux-gnu/mecab/dic/mecab-ipadic-neologd")
-wakati = MeCab.Tagger("-Osimple -d /opt/homebrew/lib/mecab/dic/mecab-ipadic-neologd")
+load_dotenv("./.env")
+wakati = MeCab.Tagger(f'-Osimple -d {os.environ.get("MECAB_DIC_PATH")}')
 
 
 def perse_simple(text: str) -> list[list[str]]:
