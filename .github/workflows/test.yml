@@ -33,6 +33,12 @@ jobs:
           echo yes | ./bin/install-mecab-ipadic-neologd -n
           echo `mecab-config --dicdir`"/mecab-ipadic-neologd"
 
+      - name: make env file
+        runn: |
+          MECAB_DIC_PATH=$(echo `mecab-config --dicdir`"/mecab-ipadic-neologd")
+          echo "MECAB_DIC_PATH=${MECAB_DIC_PATH}" > .env
+          cat .env
+
       - name: install packages
         run: pipenv install --dev
       
