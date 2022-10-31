@@ -33,6 +33,13 @@
   - 比較的新言語に対応していると思われる以下の辞書を使用する。Mecabなどは手順通りに入れる
     - https://github.com/neologd/mecab-ipadic-neologd/blob/master/README.ja.md
 
+
+## test
+- pytestを使用
+- 参考
+  - dbのfixture
+    - https://note.com/navitime_tech/n/n5286eecf5a7c
+
 ## API
 ### `feeds`
 - `/feeds/` : GET
