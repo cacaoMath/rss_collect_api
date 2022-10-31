@@ -34,7 +34,7 @@ jobs:
           echo `mecab-config --dicdir`"/mecab-ipadic-neologd"
 
       - name: make env file
-        runn: |
+        run: |
           MECAB_DIC_PATH=$(echo `mecab-config --dicdir`"/mecab-ipadic-neologd")
           echo "MECAB_DIC_PATH=${MECAB_DIC_PATH}" > .env
           cat .env
