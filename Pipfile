@@ -12,6 +12,7 @@ sqlalchemy = "*"
 mecab-python3 = "*"
 unidic-lite = "*"
 feedparser = "*"
+python-dotenv = "*"
 
 [dev-packages]
 pytest-mock = "*"
