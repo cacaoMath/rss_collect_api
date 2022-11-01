@@ -8,4 +8,4 @@ if [ -z "$(ls $directory)" ]; then
 fi
 echo "MECAB_DIC_PATH=/dic" > .env
 docker build -t deployimg .
-docker run -v dic:/dic --name mycontainer -p 8000:8000 deployimg
+docker run -d -v dic:/dic --name mycontainer -p 8000:8000 deployimg
