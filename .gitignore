@@ -187,3 +187,6 @@ cython_debug/
 
 # dotenv
 *.env
+
+# deploy用の辞書ディレクトリ
+dic/*

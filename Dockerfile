@@ -1,12 +1,14 @@
-FROM python3.10
+FROM python:3.10.8-slim
 
-COPY ./setup.sh ./setup.sh
+COPY ./deploy_setup.sh /deploy_setup.sh
+COPY ./Pipfile.lock /Pipfile.lock
+COPY ./app /app
+COPY ./dic /dic
+COPY ./.env /.env
 
-RUN ["setup.sh"]
+RUN ["/deploy_setup.sh"]
 
 EXPOSE 8000
 
-COPY ./app /app
-
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["pipenv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 
