@@ -1,12 +1,12 @@
 FROM python:3.10.8-slim
 
-COPY ./deploy_setup.sh /deploy_setup.sh
+COPY ./img_setup.sh /img_setup.sh
 COPY ./Pipfile.lock /Pipfile.lock
 COPY ./app /app
 COPY ./dic /dic
 COPY ./.env /.env
 
-RUN ["/deploy_setup.sh"]
+RUN ["/img_setup.sh"]
 
 EXPOSE 8000
 
