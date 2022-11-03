@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-apt-get update
-apt-get install -y mecab libmecab-dev mecab-ipadic-utf8
-pip install fastapi uvicorn
+apt update
+apt install -y mecab libmecab-dev mecab-ipadic-utf8
 pip install --upgrade pip
+pip install fastapi uvicorn
 pip install pipenv
 pipenv install
