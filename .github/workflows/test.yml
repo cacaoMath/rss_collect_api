@@ -9,6 +9,15 @@ on:
 jobs:
   test:
     runs-on: ubuntu-20.04
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: db
+        ports:
+          - 5432:5432
     steps:
       - name: checkout
         uses: actions/checkout@v2
@@ -37,6 +46,11 @@ jobs:
         run: |
           MECAB_DIC_PATH=$(echo `mecab-config --dicdir`"/mecab-ipadic-neologd")
           echo "MECAB_DIC_PATH=${MECAB_DIC_PATH}" > .env
+          echo "POSTGRES_USER=user" >> .env
+          echo "POSTGRES_PASSWORD=password" >> .env
+          echo "POSTGRES_DB=db" >> .env
+          echo "POSTGRES_SERVER=127.0.0.1" >> .env
+          echo "POSTGRES_SERVER_PORT=5432" >> .env
           cat .env
 
       - name: install packages
