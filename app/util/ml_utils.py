@@ -1,10 +1,9 @@
 import MeCab
 import re
-from dotenv import load_dotenv
-import os
 
-load_dotenv("./.env")
-wakati = MeCab.Tagger(f'-Osimple -d {os.environ.get("MECAB_DIC_PATH")}')
+from app.util.config import MECAB_DIC_PATH
+
+wakati = MeCab.Tagger(f'-Osimple -d {MECAB_DIC_PATH}')
 
 
 def perse_simple(text: str) -> list[list[str]]:
