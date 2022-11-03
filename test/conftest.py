@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session, sessionmaker, scoped_session
 from sqlalchemy.orm.session import close_all_sessions
 
 from app.main import app, get_db
-from app.api.models import Base
+from app.db.database import Base
 
 
 class TestingSession(Session):
@@ -32,12 +32,13 @@ def test_db():
         scopefunc=lambda: function_scope,
     )
 
-    Base.query = TestSessionLocal
+    Base.query = TestSessionLocal.query_property()
+
+    db = TestSessionLocal()
 
     # sql_app/main.py の get_db() を差し替える
     # https://fastapi.tiangolo.com/advanced/testing-dependencies/
     def get_db_for_testing():
-        db = TestSessionLocal()
         try:
             yield db
             db.commit()
@@ -47,10 +48,11 @@ def test_db():
 
     app.dependency_overrides[get_db] = get_db_for_testing
 
-    # テストケース実行
-    yield TestSessionLocal()
+    # # テストケース実行
+    yield db
 
-    # 後処理
+    # # 後処理
+    TestSessionLocal().rollback()
     TestSessionLocal.remove()
     close_all_sessions()
     engine.dispose()

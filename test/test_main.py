@@ -1,9 +1,8 @@
 from fastapi.testclient import TestClient
-import pytest
+import pandas as pd
 
 from app.main import app
 from app.api.models import LearningData
-from test.fixture_db import test_db
 
 client = TestClient(app)
 
@@ -89,7 +88,6 @@ def test_get_feed(mocker):
 
 def test_classifier_predict_if_learning_data_is_few(test_db):
     test_db.add(LearningData(word="hogehoge", category="fugafuga"))
-    test_db.flush()
     test_db.commit()
     response = client.post("/classifier/predict", json={"text": "test"})
     assert response.status_code == 500
@@ -97,22 +95,35 @@ def test_classifier_predict_if_learning_data_is_few(test_db):
       "detail": "Learning data is small. Please input more Learning data"
     }
     LearningData(word="piyopiyo", category="kogekoge")
-    test_db.flush()
     test_db.commit()
     assert response.status_code == 500
     assert response.json() == {
       "detail": "Learning data is small. Please input more Learning data"
     }
 
-@pytest.mark.skip # dbの設定がうまくいかないのでpending
-def test_classifier_predict_if_learning_data_is_three(test_db):
+
+def test_classifier_predict_if_learning_data_is_three(test_db, mocker):
     data = [
-        LearningData(word="hogehoge", category="fugafuga"),
-        LearningData(word="hogehoge", category="fugafuga"),
-        LearningData(word="hogehoge", category="fugafuga")
+        LearningData(word="hogehoge is fugafuga", category="fugafuga"),
+        LearningData(word="hogehoge was fugario", category="fugafuga"),
+        LearningData(word="hogehoge has fugashi", category="fugafuga")
     ]
     test_db.add_all(data)
     test_db.flush()
     test_db.commit()
+    # テスト時はdbが永続化されず、空になるのでmockで対応
+    mocker.patch(
+        "app.main.pd.read_sql_query",
+        return_value=pd.DataFrame(
+            {
+                "word": [d.word for d in data],
+                "category": [d.category for d in data]
+            }
+        )
+    )
     response = client.post("/classifier/predict", json={"text": "test"})
     assert response.status_code == 200
+    assert response.json() == {
+        "pred_category": "fugafuga",
+        "categories": "['fugafuga']"
+    }

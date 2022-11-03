@@ -97,3 +97,10 @@
     - null: false
     - 使用できる文字: a-z,A-Z,数字,_のみとする
 
+## デプロイ方法
+- デプロイするサーバにmecabの辞書`mecab-ipadic-NEologd`をインストールする
+  - 方法は公式に従う: https://github.com/neologd/mecab-ipadic-neologd/blob/master/README.ja.md
+  - `$ echo `mecab-config --dicdir`"/mecab-ipadic-neologd"`で辞書が確認できればOK
+- deploy.shを叩く
+  - deploy.shで必要なDockerfileのビルドや辞書のコピーなどが行われる。
+- deploy完了、localhost:8000で接続できるか確認する

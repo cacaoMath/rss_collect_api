@@ -187,3 +187,9 @@ cython_debug/
 
 # dotenv
 *.env
+
+# deploy用の辞書ディレクトリ
+dic/*
+
+# dbのdocker-compose.yml
+docker-compose.yml
