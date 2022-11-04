@@ -33,6 +33,9 @@
   - 比較的新言語に対応していると思われる以下の辞書を使用する。Mecabなどは手順通りに入れる
     - https://github.com/neologd/mecab-ipadic-neologd/blob/master/README.ja.md
 
+### rss_feed
+- feedparserを使う
+  - https://pythonhosted.org/feedparser/
 
 ## test
 - pytestを使用
