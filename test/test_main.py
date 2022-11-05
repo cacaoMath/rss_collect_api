@@ -127,7 +127,8 @@ def test_classifier_predict_if_learning_data_is_three(test_db, mocker):
         return_value=pd.DataFrame(
             {
                 "word": [d.word for d in data],
-                "category": [d.category.text for d in data]
+                "category_id": [d.category_id for d in data],
+                "text": [d.category.text for d in data]
             }
         )
     )
@@ -135,5 +136,5 @@ def test_classifier_predict_if_learning_data_is_three(test_db, mocker):
     assert response.status_code == 200
     assert response.json() == {
         "pred_category": "fugafuga",
-        "categories": "['fugafuga']"
+        "categories": ["fugafuga"]
     }
