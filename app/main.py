@@ -93,11 +93,14 @@ async def classifier_predict(pred: schemas.PredictBase, db: Session = Depends(ge
     classifier = Classifier()
     dataset["word"] = dataset["word"].apply(make_van_list)
     classifier.train(dataset["word"], dataset["category_id"])
-    category = dataset[["category_id", "text"]].drop_duplicates().set_index("category_id")
+    category = dataset[["category_id", "text"]].drop_duplicates()
     pred = classifier.predict([pred.text])
     return {
-        "pred_category": category.iloc[pred[0]],
-        "categories": category.text
+        "pred_category":
+            category[
+                category["category_id"] == pred[0]
+            ].iloc[0].text,
+        "categories": list(category.text)
     }
 
 
