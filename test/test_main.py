@@ -2,7 +2,7 @@ from fastapi.testclient import TestClient
 import pandas as pd
 
 from app.main import app
-from app.api.models import LearningData
+from app.api.models import LearningData, Category
 
 client = TestClient(app)
 
@@ -87,29 +87,36 @@ def test_get_feed(mocker):
 
 
 def test_classifier_predict_if_learning_data_is_few(test_db):
-    test_db.add(LearningData(word="hogehoge", category="fugafuga"))
+    category = Category(text="fugafuga")
+    test_db.add(category)
+    test_db.commit()
+    test_db.add(LearningData(word="hogehoge", category_id=category.id))
     test_db.commit()
     response = client.post("/classifier/predict", json={"text": "test"})
     assert response.status_code == 500
     assert response.json() == {
-      "detail": "Learning data is small. Please input more Learning data"
+        "detail": "Learning data is small. Please input more Learning data"
     }
-    LearningData(word="piyopiyo", category="kogekoge")
+    test_db.add(Category(text="kogekoge"))
+    test_db.commit()
+    test_db.add(LearningData(word="piyopiyo", category_id=category.id))
     test_db.commit()
     assert response.status_code == 500
     assert response.json() == {
-      "detail": "Learning data is small. Please input more Learning data"
+        "detail": "Learning data is small. Please input more Learning data"
     }
 
 
 def test_classifier_predict_if_learning_data_is_three(test_db, mocker):
+    category = Category(text="fugafuga")
+    test_db.add(category)
+    test_db.commit()
     data = [
-        LearningData(word="hogehoge is fugafuga", category="fugafuga"),
-        LearningData(word="hogehoge was fugario", category="fugafuga"),
-        LearningData(word="hogehoge has fugashi", category="fugafuga")
+        LearningData(word="hogehoge is fugafuga", category_id=category.id),
+        LearningData(word="hogehoge was fugario", category_id=category.id),
+        LearningData(word="hogehoge has fugashi", category_id=category.id)
     ]
     test_db.add_all(data)
-    test_db.flush()
     test_db.commit()
     # テスト時はdbが永続化されず、空になるのでmockで対応
     mocker.patch(
@@ -117,7 +124,7 @@ def test_classifier_predict_if_learning_data_is_three(test_db, mocker):
         return_value=pd.DataFrame(
             {
                 "word": [d.word for d in data],
-                "category": [d.category for d in data]
+                "category": [d.category.text for d in data]
             }
         )
     )
