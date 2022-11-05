@@ -33,6 +33,13 @@
   - 比較的新言語に対応していると思われる以下の辞書を使用する。Mecabなどは手順通りに入れる
     - https://github.com/neologd/mecab-ipadic-neologd/blob/master/README.ja.md
 
+
+## test
+- pytestを使用
+- 参考
+  - dbのfixture
+    - https://note.com/navitime_tech/n/n5286eecf5a7c
+
 ## API
 ### `feeds`
 - `/feeds/` : GET
@@ -90,3 +97,10 @@
     - null: false
     - 使用できる文字: a-z,A-Z,数字,_のみとする
 
+## デプロイ方法
+- デプロイするサーバにmecabの辞書`mecab-ipadic-NEologd`をインストールする
+  - 方法は公式に従う: https://github.com/neologd/mecab-ipadic-neologd/blob/master/README.ja.md
+  - `$ echo `mecab-config --dicdir`"/mecab-ipadic-neologd"`で辞書が確認できればOK
+- deploy.shを叩く
+  - deploy.shで必要なDockerfileのビルドや辞書のコピーなどが行われる。
+- deploy完了、localhost:8000で接続できるか確認する
