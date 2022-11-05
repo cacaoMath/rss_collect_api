@@ -26,14 +26,25 @@ class Feed(FeedBase):
 
 class LearningDataBase(BaseModel):
     word: str
-    category: str
 
 
 class LearningDataCreate(LearningDataBase):
-    pass
+    category: str
 
 
 class LearningData(LearningDataBase):
+    id: int
+    category_id: int
+
+    class Config:
+        orm_mode = True
+
+
+class CategoryBase(BaseModel):
+    text: str
+
+
+class Category(CategoryBase):
     id: int
 
     class Config:

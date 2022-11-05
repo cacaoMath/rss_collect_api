@@ -50,8 +50,27 @@ def get_all_learning_data(db: Session, skip: int = 0, limit: int = 100):
 
 
 def create_learning_data(db: Session, learning_data: schemas.LearningDataCreate):
-    db_learning_data = models.LearningData(**learning_data.dict())
+    category = get_category(db=db, category=learning_data.category)
+    db_learning_data = models.LearningData(
+        word=learning_data.word,
+        category_id=category.id
+    )
     db.add(db_learning_data)
     db.commit()
     db.refresh(db_learning_data)
     return db_learning_data
+
+
+def get_category(db: Session, category: str):
+    is_category = db.query(models.Category).filter(
+            models.Category.text == category
+        ).first()
+    return is_category if is_category is not None else create_category(db, category)
+
+
+def create_category(db: Session, category: schemas.Category):
+    db_category = models.Category(text=category)
+    db.add(db_category)
+    db.commit()
+    db.refresh(db_category)
+    return db_category

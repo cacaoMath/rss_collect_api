@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, Boolean
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
+from sqlalchemy.orm import relationship
 from app.db.database import Base
 
 
@@ -16,4 +17,12 @@ class LearningData(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     word = Column(String(255), index=True, nullable=False)
-    category = Column(String(10), nullable=False)
+    category_id = Column(Integer, ForeignKey("categories.id"))
+    category = relationship("Category", backref="learning_data")
+
+
+class Category(Base):
+    __tablename__ = "categories"
+
+    id = Column(Integer, primary_key=True, index=True)
+    text = Column(String(10), nullable=False)
