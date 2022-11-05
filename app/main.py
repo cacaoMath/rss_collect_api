@@ -81,17 +81,23 @@ async def read_classifier():
 async def classifier_predict(pred: schemas.PredictBase, db: Session = Depends(get_db)):
     if db.query(models.LearningData.word).count() < 2:
         raise HTTPException(status_code=500, detail="Learning data is small. Please input more Learning data")
-    dataset = pd.read_sql_query(sql="SELECT word, category FROM learning_data", con=db.bind)
+    dataset = pd.read_sql_query(
+            sql="""
+                SELECT word, category_id, text
+                FROM learning_data
+                INNER JOIN categories
+                ON learning_data.category_id = categories.id
+                """,
+            con=db.bind
+        )
     classifier = Classifier()
-    # カテゴリを数値化
-    dataset["y"], category = pd.factorize(dataset["category"])
     dataset["word"] = dataset["word"].apply(make_van_list)
-    classifier.train(dataset["word"], dataset["y"])
+    classifier.train(dataset["word"], dataset["category_id"])
+    category = dataset[["category_id", "text"]].drop_duplicates().set_index("category_id")
     pred = classifier.predict([pred.text])
-    categories = category.values
     return {
-        "pred_category": str(categories[pred[0]]),
-        "categories": str(categories)
+        "pred_category": category.iloc[pred[0]],
+        "categories": category.text
     }
 
 
