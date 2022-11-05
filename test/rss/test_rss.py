@@ -35,8 +35,7 @@ def test_Rss_get_feed_if_feed_url_is_any():
             published="Tue, 01 Nov 2022 11:42:00 +0900"
         ),
     ]
-    print(right_result + right_result)
-    assert result == (right_result + right_result)
+    assert result == right_result*2
 
 
 def test_Rss_make_articles():
