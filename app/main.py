@@ -5,7 +5,7 @@ import pandas as pd
 from app.api import crud, models, schemas
 from app.db.database import SessionLocal, engine
 from app.ml.classifier import Classifier
-from app.util.ml_utils import make_van_list
+from app.util.ml_utils import make_dataset_from_db
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -91,7 +91,7 @@ async def classifier_predict(pred: schemas.PredictBase, db: Session = Depends(ge
             con=db.bind
         )
     classifier = Classifier()
-    dataset["word"] = dataset["word"].apply(make_van_list)
+    dataset = make_dataset_from_db(db)
     classifier.train(dataset["word"], dataset["category_id"])
     category = dataset[["category_id", "text"]].drop_duplicates()
     pred = classifier.predict([pred.text])
