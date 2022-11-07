@@ -1,10 +1,12 @@
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
 import pandas as pd
+import numpy as np
 
 from app.api import crud, models, schemas
 from app.db.database import SessionLocal, engine
 from app.ml.classifier import Classifier
+from app.rss.rss import Rss
 from app.util.ml_utils import make_dataset_from_db
 
 models.Base.metadata.create_all(bind=engine)
@@ -81,15 +83,6 @@ async def read_classifier():
 async def classifier_predict(pred: schemas.PredictBase, db: Session = Depends(get_db)):
     if db.query(models.LearningData.word).count() < 2:
         raise HTTPException(status_code=500, detail="Learning data is small. Please input more Learning data")
-    dataset = pd.read_sql_query(
-            sql="""
-                SELECT word, category_id, text
-                FROM learning_data
-                INNER JOIN categories
-                ON learning_data.category_id = categories.id
-                """,
-            con=db.bind
-        )
     classifier = Classifier()
     dataset = make_dataset_from_db(db)
     classifier.train(dataset["word"], dataset["category_id"])
@@ -104,19 +97,23 @@ async def classifier_predict(pred: schemas.PredictBase, db: Session = Depends(ge
     }
 
 
-@app.get("/rss")
-async def read_rss():
-    return {
-        [
-            {
-                "id": 1,
-                "title": "aaa",
-                "URL": "https://bbb.com"
-            },
-            {
-                "id": 2,
-                "title": "aaa",
-                "URL": "https://bbb.com"
-            },
-        ]
-    }
+@app.post("/rss")
+async def read_rss(collect_categories: schemas.CollectCategoriesBase, db: Session = Depends(get_db)):
+    collect_categories = collect_categories.categories
+    dataset = make_dataset_from_db(db)
+    classifier = Classifier()
+    classifier.train(dataset["word"], dataset["category_id"])
+    category = dataset[["category_id", "text"]].drop_duplicates().to_numpy()
+    # 指定したカテゴリの値分だけ残すようにマスキング
+    mask = np.isin(category[:, 1], collect_categories)
+    collect_value_list = category[:, 0][mask]
+    rss = Rss()
+    feed_url_list = db.query(models.Feed.url).all()
+    feed_url_list = np.array(feed_url_list)[:, 0].tolist()
+    feed_list = rss.get_feed(feed_url_list=feed_url_list)
+    result = rss.make_articles(
+            feed_list=feed_list,
+            category_value_list=collect_value_list,
+            classifier=classifier
+        )
+    return result

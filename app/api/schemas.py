@@ -53,3 +53,7 @@ class Category(CategoryBase):
 
 class PredictBase(BaseModel):
     text: str
+
+
+class CollectCategoriesBase(BaseModel):
+    categories: list[str]

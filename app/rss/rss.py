@@ -1,7 +1,10 @@
-import json
 import feedparser
 import datetime
+import numpy as np
+from dataclasses import asdict
+
 from app.util.type import FeedItem
+from app.ml.classifier import Classifier
 
 
 class Rss():
@@ -26,9 +29,14 @@ class Rss():
                 )
         return tmp_list
 
-    def make_articles(self, collect_articles: list[dict]) -> json:
-        # ジャンル分けした記事の一覧を整形して返す
-        pass
+    # 自分が決めたジャンルの記事を集める
+    # classifierはfit後を入れる
+    def make_articles(self, feed_list: list[FeedItem], category_value_list: np.ndarray, classifier: Classifier) -> list[dict]:
+        title_list = [item.title for item in feed_list]
+        pred_list = classifier.predict(title_list)
+        pred_mask = np.isin(pred_list, category_value_list)
+        select_feed_list = np.array(feed_list)[pred_mask].tolist()
+        return [asdict(feed) for feed in select_feed_list]
 
-    def __feedparser(self, url_list: list[str]):
+    def __feedparser(self, url_list: list[str]) -> list:
         return list(map(feedparser.parse, url_list))
