@@ -7,7 +7,7 @@ from app.api.models import LearningData, Category, Feed
 client = TestClient(app)
 
 
-def test_get_feeds_if_feed_is_none():
+def test_get_feeds_if_feed_is_none(test_db):
     response = client.get("/feeds")
     assert response.status_code == 200
     assert response.json() == []
