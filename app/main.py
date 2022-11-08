@@ -8,6 +8,7 @@ from app.db.database import SessionLocal, engine
 from app.ml.classifier import Classifier
 from app.rss.rss import Rss
 from app.util.ml_utils import make_dataset_from_db
+from app.util.api_utils import check_credential
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -38,7 +39,7 @@ async def read_feed(feed_id: int, db: Session = Depends(get_db)):
 
 
 @app.post("/feeds", response_model=schemas.Feed)
-def create_feed(feed: schemas.FeedCreate, db: Session = Depends(get_db)):
+def create_feed(feed: schemas.FeedCreate, db: Session = Depends(get_db), cred: bool = Depends(check_credential)):
     db_feed = crud.get_feeds_by_url(db, feed_url=feed.url)
     if db_feed:
         raise HTTPException(status_code=400, detail="This RSS feed URL is already registered")
@@ -46,13 +47,13 @@ def create_feed(feed: schemas.FeedCreate, db: Session = Depends(get_db)):
 
 
 @app.put("/feeds/{feed_id}")
-def update_feed(feed_id: int, feed: schemas.FeedUpdate, db: Session = Depends(get_db)):
+def update_feed(feed_id: int, feed: schemas.FeedUpdate, db: Session = Depends(get_db), cred: bool = Depends(check_credential)):
     crud.update_feed(db, feed_id, feed)
     return {"message": "success"}
 
 
 @app.delete("/feeds/{feed_id}")
-def delete_feed(feed_id: int, db: Session = Depends(get_db)):
+def delete_feed(feed_id: int, db: Session = Depends(get_db), cred: bool = Depends(check_credential)):
     return crud.delete_feed(db, feed_id)
 
 
@@ -67,7 +68,7 @@ async def read_learning_data(data_id: int, db: Session = Depends(get_db)):
 
 
 @app.post("/learning-data", response_model=schemas.LearningData)
-def create_learning_data(learning_data: schemas.LearningDataCreate, db: Session = Depends(get_db)):
+def create_learning_data(learning_data: schemas.LearningDataCreate, db: Session = Depends(get_db), cred: bool = Depends(check_credential)):
     return crud.create_learning_data(db, learning_data)
 
 
@@ -80,7 +81,7 @@ async def read_classifier():
 
 
 @app.post("/classifier/predict")
-async def classifier_predict(pred: schemas.PredictBase, db: Session = Depends(get_db)):
+async def classifier_predict(pred: schemas.PredictBase, db: Session = Depends(get_db), cred: bool = Depends(check_credential)):
     if db.query(models.LearningData.word).count() < 2:
         raise HTTPException(status_code=500, detail="Learning data is small. Please input more Learning data")
     classifier = Classifier()
