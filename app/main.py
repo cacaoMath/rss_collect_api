@@ -82,7 +82,7 @@ async def read_classifier():
 
 @app.post("/classifier/predict")
 async def classifier_predict(pred: schemas.PredictBase, db: Session = Depends(get_db), cred: bool = Depends(check_credential)):
-    if db.query(models.LearningData.word).count() < 2:
+    if db.query(models.LearningData.word).count() <= 2:
         raise HTTPException(status_code=500, detail="Learning data is small. Please input more Learning data")
     classifier = Classifier()
     dataset = make_dataset_from_db(db)
