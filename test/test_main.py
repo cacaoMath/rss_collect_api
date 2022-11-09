@@ -133,7 +133,7 @@ def test_classifier_predict_if_learning_data_is_three(test_db, mocker):
     test_db.commit()
     # テスト時はdbが永続化されず、空になるのでmockで対応
     mocker.patch(
-        "app.main.pd.read_sql_query",
+        "app.main.make_dataset_from_db",
         return_value=pd.DataFrame(
             {
                 "word": [d.word for d in data],
