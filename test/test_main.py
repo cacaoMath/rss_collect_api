@@ -1,13 +1,12 @@
 from fastapi.testclient import TestClient
 import pandas as pd
-
 from app.main import app
 from app.api.models import LearningData, Category, Feed
 
 client = TestClient(app)
 
 
-def test_get_feeds_if_feed_is_none():
+def test_get_feeds_if_feed_is_none(test_db):
     response = client.get("/feeds")
     assert response.status_code == 200
     assert response.json() == []
@@ -89,21 +88,32 @@ def test_get_feed(test_db):
         }
 
 
-def test_classifier_predict_if_learning_data_is_few(test_db):
+def test_classifier_predict_if_learning_data_is_few(test_db, mocker):
     category = Category(text="fugafuga")
     test_db.add(category)
     test_db.commit()
-    test_db.add(LearningData(word="hogehoge", category_id=category.id))
+    test_db.add(LearningData(word="運転したくないなという", category_id=category.id))
     test_db.commit()
-    response = client.post("/classifier/predict", json={"text": "test"})
+    mocker.patch("secrets.compare_digest", result_value=True)
+    response = client.post(
+        "/classifier/predict",
+        json={"text": "test"},
+        headers={"Authorization": "Basic dXNlcjpwYXNzd29yZA=="}
+    )
     assert response.status_code == 500
     assert response.json() == {
         "detail": "Learning data is small. Please input more Learning data"
     }
-    test_db.add(Category(text="kogekoge"))
+    # 2が境界値
+    test_db.add(Category(text="fugafuga"))
     test_db.commit()
-    test_db.add(LearningData(word="piyopiyo", category_id=category.id))
+    test_db.add(LearningData(word="私は車に乗ります", category_id=category.id))
     test_db.commit()
+    response = client.post(
+        "/classifier/predict",
+        json={"text": "test"},
+        headers={"Authorization": "Basic dXNlcjpwYXNzd29yZA=="}
+    )
     assert response.status_code == 500
     assert response.json() == {
         "detail": "Learning data is small. Please input more Learning data"
@@ -123,7 +133,7 @@ def test_classifier_predict_if_learning_data_is_three(test_db, mocker):
     test_db.commit()
     # テスト時はdbが永続化されず、空になるのでmockで対応
     mocker.patch(
-        "app.main.pd.read_sql_query",
+        "app.main.make_dataset_from_db",
         return_value=pd.DataFrame(
             {
                 "word": [d.word for d in data],
@@ -132,7 +142,12 @@ def test_classifier_predict_if_learning_data_is_three(test_db, mocker):
             }
         )
     )
-    response = client.post("/classifier/predict", json={"text": "test"})
+    mocker.patch("secrets.compare_digest", result_value=True)
+    response = client.post(
+            "/classifier/predict",
+            json={"text": "test"},
+            headers={"Authorization": "Basic dXNlcjpwYXNzd29yZA=="}
+        )
     assert response.status_code == 200
     assert response.json() == {
         "pred_category": "fugafuga",
