@@ -95,11 +95,17 @@ def test_classifier_predict_if_learning_data_is_few(test_db, mocker):
     test_db.commit()
     test_db.add(LearningData(word="運転したくないなという", category_id=category.id))
     test_db.commit()
-    response = client.post("/classifier/predict", json={"text": "test"})
+    mocker.patch("secrets.compare_digest", result_value=True)
+    response = client.post(
+        "/classifier/predict",
+        json={"text": "test"},
+        headers={"Authorization": "Basic dXNlcjpwYXNzd29yZA=="}
+    )
     assert response.status_code == 500
     assert response.json() == {
         "detail": "Learning data is small. Please input more Learning data"
     }
+    # 2が境界値
     test_db.add(Category(text="fugafuga"))
     test_db.commit()
     test_db.add(LearningData(word="私は車に乗ります", category_id=category.id))
