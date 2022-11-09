@@ -44,6 +44,7 @@
     - https://note.com/navitime_tech/n/n5286eecf5a7c
 
 ## API
+- POST,UPDATE,DELETEの処理はBASIC認証が必要
 ### `feeds`
 - `/feeds/` : GET
   - 登録しているRSS feed URLの一覧表示
@@ -74,8 +75,8 @@
 - `/classifier/predict` : POST
   - テキストのジャンルを推定
 ### `rss`
-- `/rss/` : GET
-  - 分類器を使用して、ジャンル分けされた記事のタイトル、日付、URLなどをJSONで返す
+- `/rss/` : POST
+  - 分類器を使用して、POSTしたジャンルで集められた記事のタイトル、日付、URLなどをJSONで返す
 
 ## Model
 ### feeds
@@ -94,11 +95,15 @@
   - valid
     - length: 255
     - null: false
+- category_id: Categoryのデータに紐づくid
+- category : Categoryとリレーション
+
+### Category
 - category: str
   - valid
     - length: 10
     - null: false
-    - 使用できる文字: a-z,A-Z,数字,_のみとする
+    - 使用できる文字: a-z,A-Z,数字,_のみとする(未実装)
 
 ## デプロイ方法
 - デプロイするサーバにmecabの辞書`mecab-ipadic-NEologd`をインストールする
