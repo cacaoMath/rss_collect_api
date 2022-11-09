@@ -1,6 +1,5 @@
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
-import pandas as pd
 import numpy as np
 
 from app.api import crud, models, schemas

@@ -1,6 +1,5 @@
 from fastapi.testclient import TestClient
 import pandas as pd
-import os
 from app.main import app
 from app.api.models import LearningData, Category, Feed
 
