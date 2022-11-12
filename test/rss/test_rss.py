@@ -5,7 +5,7 @@ rss = Rss()
 
 def test_Rss_get_feed_if_feed_url_is_none():
     url_list = []
-    assert rss.get_feed(feed_url_list=url_list) == []
+    assert rss.get_feed(feed_url_list=url_list) == [], "空リストがかえってくること"
 
 
 def test_Rss_get_feed_if_feed_url_is_any():
@@ -35,8 +35,8 @@ def test_Rss_get_feed_if_feed_url_is_any():
             published="Tue, 01 Nov 2022 11:42:00 +0900"
         ),
     ]
-    assert result == right_result*2
+    assert result == right_result*2, "2つのurl(file)分のFeedItemがかえってくること"
 
 
 def test_Rss_make_articles():
-    pass
+    feed_list = []
