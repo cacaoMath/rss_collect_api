@@ -153,3 +153,52 @@ def test_classifier_predict_if_learning_data_is_three(test_db, mocker):
         "pred_category": "fugafuga",
         "categories": ["fugafuga"]
     }
+
+
+def test_read_rss_(test_db, mocker):
+    category = Category(text="fugafuga")
+    test_db.add(category)
+    test_db.commit()
+    data = [
+        LearningData(word="hogehoge is fugafuga", category_id=category.id),
+        LearningData(word="hogehoge was fugario", category_id=category.id),
+        LearningData(word="hogehoge has fugashi", category_id=category.id)
+    ]
+    test_db.add_all(data)
+    feed = Feed(url="test/rss/resource/rss_a.xml")
+    test_db.add(feed)
+    test_db.commit()
+    # テスト時はdbが永続化されず、空になるのでmockで対応
+    mocker.patch(
+        "app.main.make_dataset_from_db",
+        return_value=pd.DataFrame(
+            {
+                "word": [d.word for d in data],
+                "category_id": [d.category_id for d in data],
+                "text": [d.category.text for d in data]
+            }
+        )
+    )
+    mocker.patch("secrets.compare_digest", result_value=True)
+    response = client.post(
+        "/rss",
+        json={"categories": ["fugafuga"]},
+        headers={"Authorization": "Basic dXNlcjpwYXNzd29yZA=="}
+    )
+    assert response.json() == [
+        {
+            'link': 'https://aaa.co.jp/aaa.html',
+            'published': 'Fri, 04 Nov 2022 09:40:00 +0900',
+            'summary': 'hugahuga', 'title': 'aaaa'
+        },
+        {
+            'link': 'https://bbb.co.jp/bbb.html',
+            'published': 'Wed, 02 Nov 2022 07:00:00 +0900',
+            'summary': 'hogehoge', 'title': 'bbbb'
+        },
+        {
+            'link': 'https://ccc.co.jp/ccc.html',
+            'published': 'Tue, 01 Nov 2022 11:42:00 +0900',
+            'summary': 'kogekoge', 'title': 'cccc'
+        },
+    ], "返す値がおかしいよ！"
