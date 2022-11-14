@@ -41,7 +41,8 @@ async def read_feed(feed_id: int, db: Session = Depends(get_db)):
 def create_feed(feed: schemas.FeedCreate, db: Session = Depends(get_db), cred: bool = Depends(check_credential)):
     db_feed = crud.get_feeds_by_url(db, feed_url=feed.url)
     if db_feed:
-        raise HTTPException(status_code=400, detail="This RSS feed URL is already registered")
+        raise HTTPException(
+            status_code=400, detail="This RSS feed URL is already registered")
     return crud.create_feed(db, feed)
 
 
@@ -82,7 +83,8 @@ async def read_classifier():
 @app.post("/classifier/predict")
 async def classifier_predict(pred: schemas.PredictBase, db: Session = Depends(get_db), cred: bool = Depends(check_credential)):
     if db.query(models.LearningData.word).count() <= 2:
-        raise HTTPException(status_code=500, detail="Learning data is small. Please input more Learning data")
+        raise HTTPException(
+            status_code=500, detail="Learning data is small. Please input more Learning data")
     classifier = Classifier()
     dataset = make_dataset_from_db(db)
     classifier.train(dataset["word"], dataset["category_id"])
@@ -112,8 +114,8 @@ async def read_rss(collect_categories: schemas.CollectCategoriesBase, db: Sessio
     feed_url_list = np.array(feed_url_list)[:, 0].tolist()
     feed_list = rss.get_feed(feed_url_list=feed_url_list)
     result = rss.make_articles(
-            feed_list=feed_list,
-            category_value_list=collect_value_list,
-            classifier=classifier
-        )
+        feed_list=feed_list,
+        category_value_list=collect_value_list,
+        classifier=classifier
+    )
     return result
