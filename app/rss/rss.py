@@ -1,7 +1,6 @@
 import feedparser
 import datetime
 import numpy as np
-from dataclasses import asdict
 
 from app.util.type import FeedItem
 from app.ml.classifier import Classifier
@@ -36,7 +35,7 @@ class Rss():
         pred_list = classifier.predict(title_list)
         pred_mask = np.isin(pred_list, category_value_list)
         select_feed_list = np.array(feed_list)[pred_mask].tolist()
-        return [asdict(feed) for feed in select_feed_list]
+        return list(map(lambda x: x, select_feed_list))
 
     def __feedparser(self, url_list: list[str]) -> list:
         return list(map(feedparser.parse, url_list))
