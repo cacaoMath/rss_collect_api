@@ -1,6 +1,10 @@
 from sqlalchemy.orm import Session
+import numpy as np
 
 from . import models, schemas
+from app.rss.rss import Rss
+from app.util.ml_utils import make_dataset_from_db
+from app.ml.classifier import Classifier
 
 
 def get_feed(db: Session, feed_id: int):
@@ -63,8 +67,8 @@ def create_learning_data(db: Session, learning_data: schemas.LearningDataCreate)
 
 def get_category(db: Session, category: str):
     is_category = db.query(models.Category).filter(
-            models.Category.text == category
-        ).first()
+        models.Category.text == category
+    ).first()
     return is_category if is_category is not None else create_category(db, category)
 
 
@@ -74,3 +78,23 @@ def create_category(db: Session, category: schemas.Category):
     db.commit()
     db.refresh(db_category)
     return db_category
+
+
+def return_rss_articles(db: Session, collect_categories: schemas.CollectCategoriesBase):
+    collect_categories = collect_categories.categories
+    dataset = make_dataset_from_db(db)
+    classifier = Classifier()
+    classifier.train(dataset["word"], dataset["category_id"])
+    category = dataset[["category_id", "text"]].drop_duplicates().to_numpy()
+    # 指定したカテゴリの値分だけ残すようにマスキング
+    mask = np.isin(category[:, 1], collect_categories)
+    collect_value_list = category[:, 0][mask]
+    rss = Rss()
+    feed_url_list = db.query(models.Feed.url).all()
+    feed_url_list = np.array(feed_url_list)[:, 0].tolist()
+    feed_list = rss.get_feed(feed_url_list=feed_url_list)
+    return rss.make_articles(
+        feed_list=feed_list,
+        category_value_list=collect_value_list,
+        classifier=classifier
+    )

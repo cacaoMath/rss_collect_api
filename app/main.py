@@ -101,21 +101,4 @@ async def classifier_predict(pred: schemas.PredictBase, db: Session = Depends(ge
 
 @app.post("/rss")
 async def read_rss(collect_categories: schemas.CollectCategoriesBase, db: Session = Depends(get_db)):
-    collect_categories = collect_categories.categories
-    dataset = make_dataset_from_db(db)
-    classifier = Classifier()
-    classifier.train(dataset["word"], dataset["category_id"])
-    category = dataset[["category_id", "text"]].drop_duplicates().to_numpy()
-    # 指定したカテゴリの値分だけ残すようにマスキング
-    mask = np.isin(category[:, 1], collect_categories)
-    collect_value_list = category[:, 0][mask]
-    rss = Rss()
-    feed_url_list = db.query(models.Feed.url).all()
-    feed_url_list = np.array(feed_url_list)[:, 0].tolist()
-    feed_list = rss.get_feed(feed_url_list=feed_url_list)
-    result = rss.make_articles(
-        feed_list=feed_list,
-        category_value_list=collect_value_list,
-        classifier=classifier
-    )
-    return result
+    return crud.return_rss_articles(db=db, collect_categories=collect_categories)
