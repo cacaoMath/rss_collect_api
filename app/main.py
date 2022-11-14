@@ -6,6 +6,7 @@ from app.db.database import SessionLocal, engine
 from app.ml.classifier import Classifier
 from app.util.ml_utils import make_dataset_from_db
 from app.util.api_utils import check_credential
+from app.util.type import FeedItem
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -97,6 +98,6 @@ async def classifier_predict(pred: schemas.PredictBase, db: Session = Depends(ge
     }
 
 
-@app.post("/rss")
+@app.post("/rss", response_model=list[FeedItem])
 async def read_rss(collect_categories: schemas.CollectCategoriesBase, db: Session = Depends(get_db)):
     return crud.return_rss_articles(db=db, collect_categories=collect_categories)
