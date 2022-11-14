@@ -1,11 +1,9 @@
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
-import numpy as np
 
 from app.api import crud, models, schemas
 from app.db.database import SessionLocal, engine
 from app.ml.classifier import Classifier
-from app.rss.rss import Rss
 from app.util.ml_utils import make_dataset_from_db
 from app.util.api_utils import check_credential
 

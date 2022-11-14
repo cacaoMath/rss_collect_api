@@ -26,11 +26,11 @@ def test_get_feeds_if_feed_is_one(test_db):
     response = client.get("/feeds")
     assert response.status_code == 200
     assert response.json() == [{
-                "url": "https://example.com/hoge.xml",
-                "description": "hogehoge",
-                "id": 1,
-                "is_active": True
-            }]
+        "url": "https://example.com/hoge.xml",
+        "description": "hogehoge",
+        "id": 1,
+        "is_active": True
+    }]
 
 
 def test_get_feeds_if_feed_is_two(test_db):
@@ -54,17 +54,17 @@ def test_get_feeds_if_feed_is_two(test_db):
     response = client.get("/feeds")
     assert response.status_code == 200
     assert response.json() == [{
-                "url": "https://example.com/hoge.xml",
-                "description": "hogehoge",
-                "id": 1,
-                "is_active": True
-            },
-            {
-                "url": "https://example.com/fuga.xml",
-                "description": "fugafuga",
-                "id": 2,
-                "is_active": False
-            }]
+        "url": "https://example.com/hoge.xml",
+        "description": "hogehoge",
+        "id": 1,
+        "is_active": True
+    },
+        {
+        "url": "https://example.com/fuga.xml",
+        "description": "fugafuga",
+        "id": 2,
+        "is_active": False
+    }]
 
 
 def test_get_feed(test_db):
@@ -81,11 +81,11 @@ def test_get_feed(test_db):
     response = client.get("/feeds/1")
     assert response.status_code == 200
     assert response.json() == {
-            "url": "https://example.com/hoge.xml",
-            "description": "hogehoge",
-            "id": 1,
-            "is_active": True
-        }
+        "url": "https://example.com/hoge.xml",
+        "description": "hogehoge",
+        "id": 1,
+        "is_active": True
+    }
 
 
 def test_classifier_predict_if_learning_data_is_few(test_db, mocker):
@@ -144,10 +144,10 @@ def test_classifier_predict_if_learning_data_is_three(test_db, mocker):
     )
     mocker.patch("secrets.compare_digest", result_value=True)
     response = client.post(
-            "/classifier/predict",
-            json={"text": "test"},
-            headers={"Authorization": "Basic dXNlcjpwYXNzd29yZA=="}
-        )
+        "/classifier/predict",
+        json={"text": "test"},
+        headers={"Authorization": "Basic dXNlcjpwYXNzd29yZA=="}
+    )
     assert response.status_code == 200
     assert response.json() == {
         "pred_category": "fugafuga",
@@ -170,7 +170,7 @@ def test_read_rss_(test_db, mocker):
     test_db.commit()
     # テスト時はdbが永続化されず、空になるのでmockで対応
     mocker.patch(
-        "app.main.make_dataset_from_db",
+        "app.api.crud.make_dataset_from_db",
         return_value=pd.DataFrame(
             {
                 "word": [d.word for d in data],
@@ -187,18 +187,21 @@ def test_read_rss_(test_db, mocker):
     )
     assert response.json() == [
         {
+            'title': 'aaaa',
             'link': 'https://aaa.co.jp/aaa.html',
             'published': 'Fri, 04 Nov 2022 09:40:00 +0900',
-            'summary': 'hugahuga', 'title': 'aaaa'
+            'summary': 'hugahuga',
         },
         {
+            'title': 'bbbb',
             'link': 'https://bbb.co.jp/bbb.html',
             'published': 'Wed, 02 Nov 2022 07:00:00 +0900',
-            'summary': 'hogehoge', 'title': 'bbbb'
+            'summary': 'hogehoge',
         },
         {
+            'title': 'cccc',
             'link': 'https://ccc.co.jp/ccc.html',
             'published': 'Tue, 01 Nov 2022 11:42:00 +0900',
-            'summary': 'kogekoge', 'title': 'cccc'
+            'summary': 'kogekoge',
         },
     ], "返す値がおかしいよ！"
