@@ -182,6 +182,14 @@ def test_read_rss_(test_db, mocker):
     mocker.patch("secrets.compare_digest", result_value=True)
     response = client.post(
         "/rss",
+        json={"categories": ["mogamoga"]},
+        headers={"Authorization": "Basic dXNlcjpwYXNzd29yZA=="}
+    )
+    assert response.json() == {
+        "detail": "Those coategories are not present."
+    }, "存在しないカテゴリでも404がかえってないよ"
+    response = client.post(
+        "/rss",
         json={"categories": ["fugafuga"]},
         headers={"Authorization": "Basic dXNlcjpwYXNzd29yZA=="}
     )
