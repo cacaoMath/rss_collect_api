@@ -44,6 +44,7 @@
     - https://note.com/navitime_tech/n/n5286eecf5a7c
 
 ## API
+- `/docs` or `/redoc`で詳細の確認が可能
 - POST,UPDATE,DELETEの処理はBASIC認証が必要
 ### `feeds`
 - `/feeds/` : GET
@@ -70,10 +71,11 @@
   - 学習データの追加
 
 ### `classifier`
-- `/classifier` : GET
+- `/classifier` : GET　（モデルの仕様で未実装）
   - モデル更新日出力
 - `/classifier/predict` : POST
   - テキストのジャンルを推定
+
 ### `rss`
 - `/rss/` : POST
   - 分類器を使用して、POSTしたジャンルで集められた記事のタイトル、日付、URLなどをJSONで返す
