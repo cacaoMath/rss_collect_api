@@ -80,8 +80,7 @@ def create_category(db: Session, category: schemas.Category):
     return db_category
 
 
-def return_rss_articles(db: Session, collect_categories: schemas.CollectCategoriesBase):
-    collect_categories = collect_categories.categories
+def return_rss_articles(db: Session, collect_categories: list[str]):
     dataset = make_dataset_from_db(db)
     classifier = Classifier()
     classifier.train(dataset["word"], dataset["category_id"])
@@ -100,3 +99,9 @@ def return_rss_articles(db: Session, collect_categories: schemas.CollectCategori
         category_value_list=collect_value_list,
         classifier=classifier
     )
+
+
+def get_present_categories(db: Session, category_list: list[str]) -> list[str]:
+    categories = db.query(models.Category.text).all()
+    categories = [category[0] for category in categories]
+    return list(set(category_list) & set(categories))

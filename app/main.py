@@ -100,4 +100,9 @@ async def classifier_predict(pred: schemas.PredictBase, db: Session = Depends(ge
 
 @app.post("/rss", response_model=list[FeedItem])
 async def read_rss(collect_categories: schemas.CollectCategoriesBase, db: Session = Depends(get_db)):
-    return crud.return_rss_articles(db=db, collect_categories=collect_categories)
+    present_categories = crud.get_present_categories(
+        db=db, category_list=collect_categories.categories)
+    if not len(present_categories):
+        raise HTTPException(
+            status_code=404, detail="Those coategories are not present.")
+    return crud.return_rss_articles(db=db, collect_categories=present_categories)
