@@ -30,7 +30,7 @@ class Rss():
 
     # 自分が決めたジャンルの記事を集める
     # classifierはfit後を入れる
-    def make_articles(self, feed_list: list[FeedItem], category_value_list: np.ndarray, classifier: Classifier) -> list[dict]:
+    def make_articles(self, feed_list: list[FeedItem], category_value_list: np.ndarray, classifier: Classifier) -> list[FeedItem]:
         title_list = [item.title for item in feed_list]
         pred_list = classifier.predict(title_list)
         pred_mask = np.isin(pred_list, category_value_list)
