@@ -1,11 +1,12 @@
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
-import pandas as pd
 
 from app.api import crud, models, schemas
 from app.db.database import SessionLocal, engine
 from app.ml.classifier import Classifier
-from app.util.ml_utils import make_van_list
+from app.util.ml_utils import make_dataset_from_db
+from app.util.api_utils import check_credential
+from app.util.type import FeedItem
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -36,21 +37,22 @@ async def read_feed(feed_id: int, db: Session = Depends(get_db)):
 
 
 @app.post("/feeds", response_model=schemas.Feed)
-def create_feed(feed: schemas.FeedCreate, db: Session = Depends(get_db)):
+def create_feed(feed: schemas.FeedCreate, db: Session = Depends(get_db), cred: bool = Depends(check_credential)):
     db_feed = crud.get_feeds_by_url(db, feed_url=feed.url)
     if db_feed:
-        raise HTTPException(status_code=400, detail="This RSS feed URL is already registered")
+        raise HTTPException(
+            status_code=400, detail="This RSS feed URL is already registered")
     return crud.create_feed(db, feed)
 
 
 @app.put("/feeds/{feed_id}")
-def update_feed(feed_id: int, feed: schemas.FeedUpdate, db: Session = Depends(get_db)):
+def update_feed(feed_id: int, feed: schemas.FeedUpdate, db: Session = Depends(get_db), cred: bool = Depends(check_credential)):
     crud.update_feed(db, feed_id, feed)
     return {"message": "success"}
 
 
 @app.delete("/feeds/{feed_id}")
-def delete_feed(feed_id: int, db: Session = Depends(get_db)):
+def delete_feed(feed_id: int, db: Session = Depends(get_db), cred: bool = Depends(check_credential)):
     return crud.delete_feed(db, feed_id)
 
 
@@ -65,7 +67,7 @@ async def read_learning_data(data_id: int, db: Session = Depends(get_db)):
 
 
 @app.post("/learning-data", response_model=schemas.LearningData)
-def create_learning_data(learning_data: schemas.LearningDataCreate, db: Session = Depends(get_db)):
+def create_learning_data(learning_data: schemas.LearningDataCreate, db: Session = Depends(get_db), cred: bool = Depends(check_credential)):
     return crud.create_learning_data(db, learning_data)
 
 
@@ -78,36 +80,34 @@ async def read_classifier():
 
 
 @app.post("/classifier/predict")
-async def classifier_predict(pred: schemas.PredictBase, db: Session = Depends(get_db)):
-    if db.query(models.LearningData.word).count() < 2:
-        raise HTTPException(status_code=500, detail="Learning data is small. Please input more Learning data")
-    dataset = pd.read_sql_query(sql="SELECT word, category FROM learning_data", con=db.bind)
+async def classifier_predict(pred: schemas.PredictBase, db: Session = Depends(get_db), cred: bool = Depends(check_credential)):
+    if db.query(models.LearningData.word).count() <= 2:
+        raise HTTPException(
+            status_code=500,
+            detail="Learning data is small. Please input more Learning data"
+        )
     classifier = Classifier()
-    # カテゴリを数値化
-    dataset["y"], category = pd.factorize(dataset["category"])
-    dataset["word"] = dataset["word"].apply(make_van_list)
-    classifier.train(dataset["word"], dataset["y"])
+    dataset = make_dataset_from_db(db)
+    classifier.train(dataset["word"], dataset["category_id"])
+    category = dataset[["category_id", "text"]].drop_duplicates()
     pred = classifier.predict([pred.text])
-    categories = category.values
     return {
-        "pred_category": str(categories[pred[0]]),
-        "categories": str(categories)
+        "pred_category":
+            category[
+                category["category_id"] == pred[0]
+            ].iloc[0].text,
+        "categories": list(category.text)
     }
 
 
-@app.get("/rss")
-async def read_rss():
-    return {
-        [
-            {
-                "id": 1,
-                "title": "aaa",
-                "URL": "https://bbb.com"
-            },
-            {
-                "id": 2,
-                "title": "aaa",
-                "URL": "https://bbb.com"
-            },
-        ]
-    }
+@app.post("/rss", response_model=list[FeedItem])
+async def read_rss(collect_categories: schemas.CollectCategoriesBase, db: Session = Depends(get_db)):
+    present_categories = crud.get_present_categories(
+        db=db, category_list=collect_categories.categories)
+    if not len(present_categories):
+        raise HTTPException(
+            status_code=404, detail="Those coategories are not present.")
+    return crud.return_rss_articles(
+        db=db,
+        collect_categories=present_categories
+    )
