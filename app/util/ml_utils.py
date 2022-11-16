@@ -37,4 +37,3 @@ def make_dataset_from_db(db: Session) -> pd.DataFrame:
     # 形態素分析を行う
     dataset["word"] = dataset["word"].apply(make_van_list)
     return dataset
-
