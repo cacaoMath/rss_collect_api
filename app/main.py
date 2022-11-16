@@ -83,7 +83,9 @@ async def read_classifier():
 async def classifier_predict(pred: schemas.PredictBase, db: Session = Depends(get_db), cred: bool = Depends(check_credential)):
     if db.query(models.LearningData.word).count() <= 2:
         raise HTTPException(
-            status_code=500, detail="Learning data is small. Please input more Learning data")
+            status_code=500,
+            detail="Learning data is small. Please input more Learning data"
+        )
     classifier = Classifier()
     dataset = make_dataset_from_db(db)
     classifier.train(dataset["word"], dataset["category_id"])
@@ -105,4 +107,7 @@ async def read_rss(collect_categories: schemas.CollectCategoriesBase, db: Sessio
     if not len(present_categories):
         raise HTTPException(
             status_code=404, detail="Those coategories are not present.")
-    return crud.return_rss_articles(db=db, collect_categories=present_categories)
+    return crud.return_rss_articles(
+        db=db,
+        collect_categories=present_categories
+    )
