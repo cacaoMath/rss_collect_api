@@ -1,7 +1,7 @@
 FROM python:3.10.8-slim
 
 COPY ./img_setup.sh /img_setup.sh
-COPY ./Pipfile.lock /Pipfile.lock
+COPY ./Pipfile /Pipfile
 COPY ./app /app
 COPY ./dic /dic
 COPY ./.env /.env
