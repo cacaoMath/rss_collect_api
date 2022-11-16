@@ -185,6 +185,7 @@ def test_read_rss_(test_db, mocker):
         json={"categories": ["mogamoga"]},
         headers={"Authorization": "Basic dXNlcjpwYXNzd29yZA=="}
     )
+    assert response.status_code == 404
     assert response.json() == {
         "detail": "Those coategories are not present."
     }, "存在しないカテゴリでも404がかえってないよ"
@@ -193,6 +194,7 @@ def test_read_rss_(test_db, mocker):
         json={"categories": ["fugafuga"]},
         headers={"Authorization": "Basic dXNlcjpwYXNzd29yZA=="}
     )
+    assert response.status_code == 200
     assert response.json() == [
         {
             'title': 'aaaa',
