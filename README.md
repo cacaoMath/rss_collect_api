@@ -33,6 +33,9 @@
   - 比較的新言語に対応していると思われる以下の辞書を使用する。Mecabなどは手順通りに入れる
     - https://github.com/neologd/mecab-ipadic-neologd/blob/master/README.ja.md
 
+### rss_feed
+- feedparserを使う
+  - https://pythonhosted.org/feedparser/
 
 ## test
 - pytestを使用
@@ -41,6 +44,8 @@
     - https://note.com/navitime_tech/n/n5286eecf5a7c
 
 ## API
+- `/docs` or `/redoc`で詳細の確認が可能
+- POST,UPDATE,DELETEの処理はBASIC認証が必要
 ### `feeds`
 - `/feeds/` : GET
   - 登録しているRSS feed URLの一覧表示
@@ -66,13 +71,14 @@
   - 学習データの追加
 
 ### `classifier`
-- `/classifier` : GET
+- `/classifier` : GET　（モデルの仕様で未実装）
   - モデル更新日出力
 - `/classifier/predict` : POST
   - テキストのジャンルを推定
+
 ### `rss`
-- `/rss/` : GET
-  - 分類器を使用して、ジャンル分けされた記事のタイトル、日付、URLなどをJSONで返す
+- `/rss/` : POST
+  - 分類器を使用して、POSTしたジャンルで集められた記事のタイトル、日付、URLなどをJSONで返す
 
 ## Model
 ### feeds
@@ -91,11 +97,15 @@
   - valid
     - length: 255
     - null: false
+- category_id: Categoryのデータに紐づくid
+- category : Categoryとリレーション
+
+### Category
 - category: str
   - valid
     - length: 10
     - null: false
-    - 使用できる文字: a-z,A-Z,数字,_のみとする
+    - 使用できる文字: a-z,A-Z,数字,_のみとする(未実装)
 
 ## デプロイ方法
 - デプロイするサーバにmecabの辞書`mecab-ipadic-NEologd`をインストールする
