@@ -22,8 +22,8 @@ class Rss():
                     FeedItem(
                         title=entry.title,
                         link=entry.link,
-                        summary=entry.summary,
-                        published=entry.published
+                        summary=self.__get_summary_attributes_of_entry(entry),
+                        published=self.__get_date_attributes_of_entry(entry)
                     )
                 )
         return tmp_list
@@ -41,3 +41,16 @@ class Rss():
 
     def __feedparser(self, url_list: list[str]) -> list:
         return list(map(feedparser.parse, url_list))
+
+    def __get_date_attributes_of_entry(self, entry):
+        if hasattr(entry, "published"):
+            return entry.published
+        elif hasattr(entry, "updated"):
+            return entry.updated
+        else:
+            return None
+
+    def __get_summary_attributes_of_entry(self, entry):
+        if not hasattr(entry, "summary"):
+            return None
+        return entry.summary
