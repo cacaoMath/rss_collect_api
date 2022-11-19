@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Session
 import numpy as np
 
-from . import models, schemas
+from . import schemas
+from app.db import models
 from app.rss.rss import Rss
 from app.util.ml_utils import make_dataset_from_db
 from app.ml.classifier import Classifier
@@ -63,6 +64,14 @@ def create_learning_data(db: Session, learning_data: schemas.LearningDataCreate)
     db.commit()
     db.refresh(db_learning_data)
     return db_learning_data
+
+
+def update_learning_data(db: Session, data_id: int, learning_data: schemas.LearningDataCreate):
+    pass
+
+
+def delete_learning_data():
+    pass
 
 
 def get_category(db: Session, category: str):

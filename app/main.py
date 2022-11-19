@@ -1,21 +1,21 @@
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
 
-from app.api import crud, models, schemas
-from app.db.database import SessionLocal, engine
+from app.api import crud, schemas
+from app.db import database, models
 from app.ml.classifier import Classifier
 from app.util.ml_utils import make_dataset_from_db
 from app.util.api_utils import check_credential
 from app.util.type import FeedItem
 
-models.Base.metadata.create_all(bind=engine)
+models.Base.metadata.create_all(bind=database.engine)
 
 app = FastAPI()
 
 
 # Dependency
 def get_db():
-    db = SessionLocal()
+    db = database.SessionLocal()
     try:
         yield db
     finally:
