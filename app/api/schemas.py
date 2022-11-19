@@ -7,10 +7,15 @@ class FeedBase(BaseModel):
 
 
 class FeedCreate(FeedBase):
-    pass
+    url: str = Field(
+        title="RSS feed URL",
+        max_length=255,
+        # https://uibakery.io/regex-library/url-regex-python 参考
+        regex="^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$"
+    )
 
 
-class FeedUpdate(FeedBase):
+class FeedUpdate(FeedCreate):
     is_active: bool
 
 
