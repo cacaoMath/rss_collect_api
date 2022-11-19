@@ -25,4 +25,4 @@ class Category(Base):
     __tablename__ = "categories"
 
     id = Column(Integer, primary_key=True, index=True)
-    text = Column(String(10), nullable=False)
+    text = Column(String(30), nullable=False)
