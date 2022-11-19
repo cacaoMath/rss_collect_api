@@ -47,14 +47,19 @@ def delete_feed(db: Session, feed_id: int):
 
 
 def get_learning_data(db: Session, data_id: int):
-    return db.query(models.LearningData).filter(models.LearningData.id == data_id).first()
+    return db.query(
+        models.LearningData
+    ).filter(
+        models.LearningData.id == data_id
+    ).first()
 
 
 def get_all_learning_data(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.LearningData).offset(skip).limit(limit).all()
 
 
-def create_learning_data(db: Session, learning_data: schemas.LearningDataCreate):
+def create_learning_data(db: Session,
+                         learning_data: schemas.LearningDataCreate):
     category = get_category(db=db, category=learning_data.category)
     db_learning_data = models.LearningData(
         word=learning_data.word,
@@ -66,7 +71,8 @@ def create_learning_data(db: Session, learning_data: schemas.LearningDataCreate)
     return db_learning_data
 
 
-def update_learning_data(db: Session, data_id: int, learning_data: schemas.LearningDataCreate):
+def update_learning_data(db: Session, data_id: int,
+                         learning_data: schemas.LearningDataCreate):
     pass
 
 
@@ -78,7 +84,9 @@ def get_category(db: Session, category: str):
     is_category = db.query(models.Category).filter(
         models.Category.text == category
     ).first()
-    return is_category if is_category is not None else create_category(db, category)
+    return is_category if is_category is not None else create_category(
+        db, category
+    )
 
 
 def create_category(db: Session, category: schemas.Category):
