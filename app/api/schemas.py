@@ -11,8 +11,6 @@ class FeedCreate(FeedBase):
 
 
 class FeedUpdate(FeedBase):
-    url: str
-    description: str | None = None
     is_active: bool
 
 
