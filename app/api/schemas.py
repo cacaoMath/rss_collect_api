@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class FeedBase(BaseModel):
@@ -29,7 +29,12 @@ class LearningDataBase(BaseModel):
 
 
 class LearningDataCreate(LearningDataBase):
-    category: str
+    category: str = Field(
+        title="Category name",
+        min_length=1,
+        max_length=30,
+        regex="^[a-zA-z0-9-].+$"  # categoryはa-z,A-Z,0-9,-のみ使用可とする
+    )
 
 
 class LearningData(LearningDataBase):
