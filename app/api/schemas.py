@@ -3,7 +3,11 @@ from pydantic import BaseModel, Field
 
 class FeedBase(BaseModel):
     url: str
-    description: str | None = None
+    description: str | None = Field(
+        default=None,
+        title="RSS feed description",
+        max_length=255
+    )
 
 
 class FeedCreate(FeedBase):
@@ -28,7 +32,11 @@ class Feed(FeedBase):
 
 
 class LearningDataBase(BaseModel):
-    word: str
+    word: str = Field(
+        title="Category name",
+        min_length=1,
+        max_length=255,
+    )
 
 
 class LearningDataCreate(LearningDataBase):
