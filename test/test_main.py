@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
 import pandas as pd
 from app.main import app
-from app.db.models import LearningData, Category, Feed
+from app.models.models import LearningData, Category, Feed
 
 client = TestClient(app)
 

@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 import numpy as np
 
 from app.schemas import schemas
-from app.db import models
+from app.models import models
 from app.rss.rss import Rss
 from app.util.ml_utils import make_dataset_from_db
 from app.ml.classifier import Classifier
