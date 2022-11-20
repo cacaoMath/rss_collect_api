@@ -188,5 +188,19 @@ def test_update_feed():
     pass
 
 
-def test_delete_feed():
-    pass
+def test_delete_feed_認証しないと削除できない(test_add_a_feed):
+    response = client.delete("/feeds/1")
+    assert response.status_code == 401
+
+
+def test_delete_feed_データを削除できる(auth_ok, test_add_a_feed):
+    response = client.delete(
+        "/feeds/1", headers={"Authorization": "Basic dXNlcjpwYXNzd29yZA=="})
+    assert response.status_code == 200
+    assert response.json() == {"message": "delete success"}
+
+
+def test_delete_feed_存在しないデータの削除(auth_ok, test_add_a_feed):
+    response = client.delete(
+        "/feeds/2", headers={"Authorization": "Basic dXNlcjpwYXNzd29yZA=="})
+    assert response.status_code == 200
