@@ -6,85 +6,24 @@ from app.models.models import LearningData, Category, Feed
 client = TestClient(app)
 
 
-def test_get_feeds_if_feed_is_none(test_db):
-    response = client.get("/feeds")
-    assert response.status_code == 200
-    assert response.json() == []
+def test_get_learning_data_all():
+    pass
 
 
-def test_get_feeds_if_feed_is_one(test_db):
-    test_db.add(
-        Feed(
-            id=1,
-            url="https://example.com/hoge.xml",
-            description="hogehoge",
-            is_active=True
-        )
-    )
-    test_db.flush()
-    test_db.commit()
-    response = client.get("/feeds")
-    assert response.status_code == 200
-    assert response.json() == [{
-        "url": "https://example.com/hoge.xml",
-        "description": "hogehoge",
-        "id": 1,
-        "is_active": True
-    }]
+def test_get_a_lerning_deta():
+    pass
 
 
-def test_get_feeds_if_feed_is_two(test_db):
-    data = [
-        Feed(
-            id=1,
-            url="https://example.com/hoge.xml",
-            description="hogehoge",
-            is_active=True
-        ),
-        Feed(
-            id=2,
-            url="https://example.com/fuga.xml",
-            description="fugafuga",
-            is_active=False
-        )
-    ]
-    test_db.add_all(data)
-    test_db.flush()
-    test_db.commit()
-    response = client.get("/feeds")
-    assert response.status_code == 200
-    assert response.json() == [{
-        "url": "https://example.com/hoge.xml",
-        "description": "hogehoge",
-        "id": 1,
-        "is_active": True
-    },
-        {
-        "url": "https://example.com/fuga.xml",
-        "description": "fugafuga",
-        "id": 2,
-        "is_active": False
-    }]
+def test_post_learning_data():
+    pass
 
 
-def test_get_feed(test_db):
-    test_db.add(
-        Feed(
-            id=1,
-            url="https://example.com/hoge.xml",
-            description="hogehoge",
-            is_active=True
-        )
-    )
-    test_db.flush()
-    test_db.commit()
-    response = client.get("/feeds/1")
+def test_get_classifier(test_db):
+    response = client.get("/calassifier")
     assert response.status_code == 200
     assert response.json() == {
-        "url": "https://example.com/hoge.xml",
-        "description": "hogehoge",
         "id": 1,
-        "is_active": True
+        "update": "yy:mm:dd:hh:mm:ss"
     }
 
 
