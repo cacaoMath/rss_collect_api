@@ -1,7 +1,8 @@
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
 
-from app.api import crud, schemas
+from app.crud import crud
+from app.api import schemas
 from app.db import database, models
 from app.ml.classifier import Classifier
 from app.util.ml_utils import make_dataset_from_db
