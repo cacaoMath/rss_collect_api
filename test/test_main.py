@@ -170,7 +170,7 @@ def test_read_rss_(test_db, mocker):
     test_db.commit()
     # テスト時はdbが永続化されず、空になるのでmockで対応
     mocker.patch(
-        "app.crud.crud.make_dataset_from_db",
+        "app.crud.rss.make_dataset_from_db",
         return_value=pd.DataFrame(
             {
                 "word": [d.word for d in data],
