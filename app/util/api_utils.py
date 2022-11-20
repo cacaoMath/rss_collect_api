@@ -2,7 +2,7 @@ import secrets
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi import Depends, HTTPException, status
 
-from app.util.env import AUTH_USER, AUTH_PASSWORD
+from app.config.env import AUTH_USER, AUTH_PASSWORD
 
 
 def check_credential(credentials: HTTPBasicCredentials = Depends(HTTPBasic())):
