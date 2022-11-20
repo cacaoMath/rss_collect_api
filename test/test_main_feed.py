@@ -6,13 +6,8 @@ import pytest
 client = TestClient(app)
 
 
-def test_get_feeds_if_feed_is_none(test_db):
-    response = client.get("/feeds")
-    assert response.status_code == 200
-    assert response.json() == []
-
-
-def test_get_feeds_if_feed_is_one(test_db):
+@pytest.fixture
+def test_add_a_feed(test_db):
     test_db.add(
         Feed(
             id=1,
@@ -23,6 +18,15 @@ def test_get_feeds_if_feed_is_one(test_db):
     )
     test_db.flush()
     test_db.commit()
+
+
+def test_get_feeds_if_feed_is_none(test_db):
+    response = client.get("/feeds")
+    assert response.status_code == 200
+    assert response.json() == []
+
+
+def test_get_feeds_if_feed_is_one(test_add_a_feed):
     response = client.get("/feeds")
     assert response.status_code == 200
     assert response.json() == [{
@@ -67,17 +71,7 @@ def test_get_feeds_if_feed_is_two(test_db):
     }]
 
 
-def test_get_feed(test_db):
-    test_db.add(
-        Feed(
-            id=1,
-            url="https://example.com/hoge.xml",
-            description="hogehoge",
-            is_active=True
-        )
-    )
-    test_db.flush()
-    test_db.commit()
+def test_get_feed_存在するidを指定する(test_db, test_add_a_feed):
     response = client.get("/feeds/1")
     assert response.status_code == 200
     assert response.json() == {
@@ -86,6 +80,11 @@ def test_get_feed(test_db):
         "id": 1,
         "is_active": True
     }
+
+
+def test_get_feed_存在しないidを指定する(test_db, test_add_a_feed):
+    response = client.get("/feeds/2")
+    assert response.status_code == 404
 
 
 def test_post_feed_認証しないとエラーになるか(test_db, mocker):
@@ -122,23 +121,13 @@ def test_post_feed_データが追加されるか(test_db, mocker):
     }
 
 
-def test_post_feed_すでに同じURLが存在したら登録できない(test_db, mocker):
+def test_post_feed_すでに同じURLが存在したら登録できない(test_db, mocker, test_add_a_feed):
     mocker.patch("secrets.compare_digest", result_value=True)
-    test_db.add(
-        Feed(
-            id=1,
-            url="http://abc.com/def.xml",
-            description="abc rss",
-            is_active=True
-        )
-    )
-    test_db.flush()
-    test_db.commit()
     response = client.post(
         "/feeds",
         json={
-            "url": "http://abc.com/def.xml",
-            "description": "abc rss"
+            "url": "https://example.com/hoge.xml",
+            "description": "hogehoge"
         },
         headers={"Authorization": "Basic dXNlcjpwYXNzd29yZA=="}
     )
