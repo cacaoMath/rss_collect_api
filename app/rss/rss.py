@@ -2,7 +2,7 @@ import feedparser
 import datetime
 import numpy as np
 
-from app.util.type import FeedItem
+from app.schemas.feed import FeedItem
 from app.ml.classifier import Classifier
 
 
@@ -30,7 +30,9 @@ class Rss():
 
     # 自分が決めたジャンルの記事を集める
     # classifierはfit後を入れる
-    def make_articles(self, feed_list: list[FeedItem], category_value_list: np.ndarray, classifier: Classifier) -> list[FeedItem]:
+    def make_articles(self, feed_list: list[FeedItem],
+                      category_value_list: np.ndarray,
+                      classifier: Classifier) -> list[FeedItem]:
         if not feed_list:
             return []
         title_list = [item.title for item in feed_list]
