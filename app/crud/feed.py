@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from app.schemas import schemas
+from app.schemas import feed
 from app.models import models
 
 
@@ -16,7 +16,7 @@ def get_feeds_by_url(db: Session, feed_url: str):
     return db.query(models.Feed).filter(models.Feed.url == feed_url).first()
 
 
-def create_feed(db: Session, feed: schemas.FeedCreate):
+def create_feed(db: Session, feed: feed.FeedCreate):
     db_feed = models.Feed(url=feed.url, description=feed.description)
     db.add(db_feed)
     db.commit()
@@ -24,7 +24,7 @@ def create_feed(db: Session, feed: schemas.FeedCreate):
     return db_feed
 
 
-def update_feed(db: Session, feed_id: int, feed: schemas.FeedUpdate):
+def update_feed(db: Session, feed_id: int, feed: feed.FeedUpdate):
     db_feed = db.query(models.Feed).filter(models.Feed.id == feed_id)
     db_feed.update({
         models.Feed.url: feed.url,

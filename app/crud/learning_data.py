@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from app.schemas import schemas
+from app.schemas import learning_data
 from app.models import models
 from app.crud.category import get_category
 
@@ -18,7 +18,7 @@ def get_all_learning_data(db: Session, skip: int = 0, limit: int = 100):
 
 
 def create_learning_data(db: Session,
-                         learning_data: schemas.LearningDataCreate):
+                         learning_data: learning_data.LearningDataCreate):
     category = get_category(db=db, category=learning_data.category)
     db_learning_data = models.LearningData(
         word=learning_data.word,
@@ -31,7 +31,7 @@ def create_learning_data(db: Session,
 
 
 def update_learning_data(db: Session, data_id: int,
-                         learning_data: schemas.LearningDataCreate):
+                         learning_data: learning_data.LearningDataCreate):
     pass
 
 

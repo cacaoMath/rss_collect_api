@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from app.schemas import schemas
+from app.schemas import category
 from app.models import models
 
 
@@ -13,7 +13,7 @@ def get_category(db: Session, category: str):
     )
 
 
-def create_category(db: Session, category: schemas.Category):
+def create_category(db: Session, category: category.Category):
     db_category = models.Category(text=category)
     db.add(db_category)
     db.commit()

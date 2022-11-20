@@ -2,7 +2,7 @@ import feedparser
 import datetime
 import numpy as np
 
-from app.util.type import FeedItem
+from app.schemas.feed import FeedItem
 from app.ml.classifier import Classifier
 
 
