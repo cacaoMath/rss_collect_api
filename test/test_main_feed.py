@@ -20,7 +20,7 @@ def test_add_a_feed(test_db):
     test_db.commit()
 
 
-def test_get_feeds_if_feed_is_none(test_db):
+def test_get_feeds_if_feed_is_none():
     response = client.get("/feeds")
     assert response.status_code == 200
     assert response.json() == []
@@ -71,7 +71,7 @@ def test_get_feeds_if_feed_is_two(test_db):
     }]
 
 
-def test_get_feed_存在するidを指定する(test_db, test_add_a_feed):
+def test_get_feed_存在するidを指定する(test_add_a_feed):
     response = client.get("/feeds/1")
     assert response.status_code == 200
     assert response.json() == {
@@ -82,12 +82,12 @@ def test_get_feed_存在するidを指定する(test_db, test_add_a_feed):
     }
 
 
-def test_get_feed_存在しないidを指定する(test_db, test_add_a_feed):
+def test_get_feed_存在しないidを指定する(test_add_a_feed):
     response = client.get("/feeds/2")
     assert response.status_code == 404
 
 
-def test_post_feed_認証しないとエラーになるか(test_db, mocker):
+def test_post_feed_認証しないとエラーになるか(mocker):
     # 認証しないとpostできない
     response = client.post(
         "/feeds",
@@ -101,7 +101,7 @@ def test_post_feed_認証しないとエラーになるか(test_db, mocker):
     assert response.json() == {'detail': 'Incorrect credentials'}
 
 
-def test_post_feed_データが追加されるか(test_db, mocker):
+def test_post_feed_データが追加されるか(mocker):
     # データが1つ追加される
     mocker.patch("secrets.compare_digest", result_value=True)
     response = client.post(
@@ -121,7 +121,7 @@ def test_post_feed_データが追加されるか(test_db, mocker):
     }
 
 
-def test_post_feed_すでに同じURLが存在したら登録できない(test_db, mocker, test_add_a_feed):
+def test_post_feed_すでに同じURLが存在したら登録できない(mocker, test_add_a_feed):
     mocker.patch("secrets.compare_digest", result_value=True)
     response = client.post(
         "/feeds",
@@ -136,7 +136,7 @@ def test_post_feed_すでに同じURLが存在したら登録できない(test_d
         'detail': 'This RSS feed URL is already registered'}
 
 
-def test_post_feed_descriptionは空でも登録可(test_db, mocker):
+def test_post_feed_descriptionは空でも登録可(mocker):
     mocker.patch("secrets.compare_digest", result_value=True)
     # descriptionが空でもいい
     response = client.post(
@@ -156,7 +156,7 @@ def test_post_feed_descriptionは空でも登録可(test_db, mocker):
     }
 
 
-def test_post_feed_URLでないものはvalidation_error(test_db, mocker):
+def test_post_feed_URLでないものはvalidation_error(mocker):
     mocker.patch("secrets.compare_digest", result_value=True)
     # URLでないものはvalidation error
     response = client.post(
@@ -176,8 +176,7 @@ def test_post_feed_URLでないものはvalidation_error(test_db, mocker):
     ("https://ac.com", "a"*255, 200),
     ("https://ac.com", "a"*256, 422),
 ])
-def test_post_feed_URLとdescriptionのバリデーション(
-        test_db, mocker, url, description, status):
+def test_post_feed_URLとdescriptionのバリデーション(mocker, url, description, status):
     mocker.patch("secrets.compare_digest", result_value=True)
     response = client.post(
         "/feeds",

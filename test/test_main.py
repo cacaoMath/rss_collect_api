@@ -18,7 +18,7 @@ def test_post_learning_data():
     pass
 
 
-def test_get_classifier(test_db):
+def test_get_classifier():
     response = client.get("/calassifier")
     assert response.status_code == 200
     assert response.json() == {
