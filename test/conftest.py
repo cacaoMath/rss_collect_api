@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session, sessionmaker, scoped_session
 from sqlalchemy.orm.session import close_all_sessions
 
 from app.main import app, get_db
-from app.db.database import Base
+from app.config.database import Base
 
 
 class TestingSession(Session):

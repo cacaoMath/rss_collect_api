@@ -3,7 +3,8 @@ from sqlalchemy.orm import Session
 
 from app.crud import crud
 from app.schemas import schemas
-from app.db import database, models
+from app.db import models
+from app.config import database
 from app.ml.classifier import Classifier
 from app.util.ml_utils import make_dataset_from_db
 from app.util.api_utils import check_credential
