@@ -1,6 +1,7 @@
 from fastapi.testclient import TestClient
 from app.main import app
 from app.models.models import Feed
+import pytest
 
 client = TestClient(app)
 
@@ -180,62 +181,24 @@ def test_post_feed_URLでないものはvalidation_error(test_db, mocker):
     assert response.status_code == 422, "validationがおかしいよ"
 
 
-def test_post_feed_URLは255字まで入力可能(test_db, mocker):
+@pytest.mark.parametrize(("url", "description", "status"), [
+    ("https://ac.com/"+"a"*240, "", 200),
+    ("https://ac.com/"+"a"*241, "", 422),
+    ("https://ac.com", "a"*255, 200),
+    ("https://ac.com", "a"*256, 422),
+])
+def test_post_feed_URLとdescriptionのバリデーション(
+        test_db, mocker, url, description, status):
     mocker.patch("secrets.compare_digest", result_value=True)
-    # URLは255文字以内はOK
-    str_240 = "abcde"*48
     response = client.post(
         "/feeds",
         json={
-            "url": "https://ac.com/"+str_240,
-            "description": ""
+            "url": url,
+            "description": description
         },
         headers={"Authorization": "Basic dXNlcjpwYXNzd29yZA=="}
     )
-    assert response.status_code == 200, "文字数制限がおかしいよ"
-
-
-def test_post_feed_URLは256字以上は入力不可(test_db, mocker):
-    mocker.patch("secrets.compare_digest", result_value=True)
-    # URLは256文字以上はNG
-    str_240 = "abcde"*48
-    response = client.post(
-        "/feeds",
-        json={
-            "url": "https://acb.com/"+str_240,
-            "description": ""
-        },
-        headers={"Authorization": "Basic dXNlcjpwYXNzd29yZA=="}
-    )
-    assert response.status_code == 422, "255文字の制限に引っ掛かってないよ"
-
-
-def test_post_feed_descriptionは255字までは入力可能(test_db, mocker):
-    mocker.patch("secrets.compare_digest", result_value=True)
-    # URLは256文字以上はNG
-    response = client.post(
-        "/feeds",
-        json={
-            "url": "https://acb.com/ddd.xml",
-            "description": "a"*255
-        },
-        headers={"Authorization": "Basic dXNlcjpwYXNzd29yZA=="}
-    )
-    assert response.status_code == 200, "文字数制限がおかしいよ"
-
-
-def test_post_feed_descriptionは256字以上は入力不可(test_db, mocker):
-    mocker.patch("secrets.compare_digest", result_value=True)
-    # URLは256文字以上はNG
-    response = client.post(
-        "/feeds",
-        json={
-            "url": "https://acb.com/ddd.xml",
-            "description": "a"*256
-        },
-        headers={"Authorization": "Basic dXNlcjpwYXNzd29yZA=="}
-    )
-    assert response.status_code == 422, "255文字の制限に引っ掛かってないよ"
+    assert response.status_code == status
 
 
 def test_update_feed():
