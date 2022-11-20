@@ -3,7 +3,7 @@ import re
 import pandas as pd
 from sqlalchemy.orm import Session
 
-from app.util.config import MECAB_DIC_PATH
+from app.util.env import MECAB_DIC_PATH
 
 wakati = MeCab.Tagger(f'-Osimple -d {MECAB_DIC_PATH}')
 
