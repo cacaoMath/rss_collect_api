@@ -9,6 +9,11 @@ from app.main import app, get_db
 from app.config.database import Base
 
 
+@pytest.fixture
+def auth_ok(mocker):
+    mocker.patch("secrets.compare_digest", result_value=True)
+
+
 class TestingSession(Session):
     def commit(self):
         # テストなので永続化しない

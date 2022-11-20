@@ -87,7 +87,7 @@ def test_get_feed_存在しないidを指定する(test_add_a_feed):
     assert response.status_code == 404
 
 
-def test_post_feed_認証しないとエラーになるか(mocker):
+def test_post_feed_認証しないとエラーになるか():
     # 認証しないとpostできない
     response = client.post(
         "/feeds",
@@ -101,9 +101,8 @@ def test_post_feed_認証しないとエラーになるか(mocker):
     assert response.json() == {'detail': 'Incorrect credentials'}
 
 
-def test_post_feed_データが追加されるか(mocker):
+def test_post_feed_データが追加されるか(auth_ok):
     # データが1つ追加される
-    mocker.patch("secrets.compare_digest", result_value=True)
     response = client.post(
         "/feeds",
         json={
@@ -121,8 +120,7 @@ def test_post_feed_データが追加されるか(mocker):
     }
 
 
-def test_post_feed_すでに同じURLが存在したら登録できない(mocker, test_add_a_feed):
-    mocker.patch("secrets.compare_digest", result_value=True)
+def test_post_feed_すでに同じURLが存在したら登録できない(auth_ok, test_add_a_feed):
     response = client.post(
         "/feeds",
         json={
@@ -136,8 +134,7 @@ def test_post_feed_すでに同じURLが存在したら登録できない(mocker
         'detail': 'This RSS feed URL is already registered'}
 
 
-def test_post_feed_descriptionは空でも登録可(mocker):
-    mocker.patch("secrets.compare_digest", result_value=True)
+def test_post_feed_descriptionは空でも登録可(auth_ok):
     # descriptionが空でもいい
     response = client.post(
         "/feeds",
@@ -156,8 +153,7 @@ def test_post_feed_descriptionは空でも登録可(mocker):
     }
 
 
-def test_post_feed_URLでないものはvalidation_error(mocker):
-    mocker.patch("secrets.compare_digest", result_value=True)
+def test_post_feed_URLでないものはvalidation_error(auth_ok):
     # URLでないものはvalidation error
     response = client.post(
         "/feeds",
@@ -176,8 +172,7 @@ def test_post_feed_URLでないものはvalidation_error(mocker):
     ("https://ac.com", "a"*255, 200),
     ("https://ac.com", "a"*256, 422),
 ])
-def test_post_feed_URLとdescriptionのバリデーション(mocker, url, description, status):
-    mocker.patch("secrets.compare_digest", result_value=True)
+def test_post_feed_URLとdescriptionのバリデーション(auth_ok, url, description, status):
     response = client.post(
         "/feeds",
         json={
