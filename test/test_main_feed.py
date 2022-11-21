@@ -184,8 +184,118 @@ def test_post_feed_URLとdescriptionのバリデーション(url, description, s
     assert response.status_code == status
 
 
-def test_update_feed(add_a_feed_data):
-    pass
+def test_update_feed_認証しないと更新できない(add_a_feed_data):
+    response = client.put(
+        "/feeds/1",
+        json={
+            "url": "https://abc.com",
+            "description": "update",
+            "is_active": True
+        }
+    )
+    assert response.status_code == 401
+
+
+def test_update_feed_データの更新ができる(add_a_feed_data, test_db):
+    response = client.put(
+        "/feeds/1",
+        json={
+            "url": "https://abc.com",
+            "description": "update",
+            "is_active": False
+        },
+        headers={"Authorization": "Basic dXNlcjpwYXNzd29yZA=="}
+    )
+    assert response.status_code == 200
+    assert response.json() == {"message": "success"}
+    first_feed = test_db.query(Feed).filter(Feed.id == 1).first()
+    assert first_feed.url == "https://abc.com"
+    assert first_feed.description == "update"
+    assert first_feed.is_active is False
+
+
+def test_update_feed_すでに同じURLが存在したら更新できない(add_a_feed_data):
+    response = client.put(
+        "/feeds/1",
+        json={
+            "url": "https://example.com/hoge.xml",
+            "description": "hogehoge",
+            "is_active": True
+        },
+        headers={"Authorization": "Basic dXNlcjpwYXNzd29yZA=="}
+    )
+    assert response.status_code == 400
+    assert response.json() == {
+        'detail': 'This RSS feed URL is already registered'}
+
+
+def test_update_feed_descriptionは空でも更新可(add_a_feed_data, test_db):
+    # descriptionが空でもいい
+    response = client.put(
+        "/feeds/1",
+        json={
+            "url": "http://ghi.com/jkl.xml",
+            "description": "",
+            "is_active": True
+        },
+        headers={"Authorization": "Basic dXNlcjpwYXNzd29yZA=="}
+    )
+    assert response.status_code == 200
+    assert response.json() == {"message": "success"}
+    first_feed = test_db.query(Feed).filter(Feed.id == 1).first()
+    assert first_feed.url == "http://ghi.com/jkl.xml"
+    assert first_feed.description == ""
+    assert first_feed.is_active is True
+
+
+def test_update_feed_URLでないものはvalidation_error(add_a_feed_data):
+    # URLでないものはvalidation error
+    response = client.put(
+        "/feeds/1",
+        json={
+            "url": "🥺エラーだよ",
+            "description": "",
+            "is_active": True
+        },
+        headers={"Authorization": "Basic dXNlcjpwYXNzd29yZA=="}
+    )
+    assert response.status_code == 422, "validationがおかしいよ"
+
+
+@pytest.mark.parametrize(("url", "description", "status"), [
+    ("https://ac.com/"+"a"*240, "", 200),
+    ("https://ac.com/"+"a"*241, "", 422),
+    ("https://ac.com", "a"*255, 200),
+    ("https://ac.com", "a"*256, 422),
+])
+def test_update_feed_URLとdescriptionのバリデーション(url, description, status):
+    response = client.put(
+        "/feeds/1",
+        json={
+            "url": url,
+            "description": description,
+            "is_active": True
+        },
+        headers={"Authorization": "Basic dXNlcjpwYXNzd29yZA=="}
+    )
+    assert response.status_code == status
+
+
+@pytest.mark.parametrize(("is_active", "status"), [
+    (True, 200),
+    (False, 200),
+])
+def test_update_feed_is_activeが更新できるか(is_active, status):
+    response = client.put(
+        "/feeds/1",
+        json={
+            "url": "https://abc.com",
+            "description": "update",
+            "is_active": is_active
+        },
+        headers={"Authorization": "Basic dXNlcjpwYXNzd29yZA=="}
+    )
+    assert response.status_code == status
 
 
 def test_delete_feed_認証しないと削除できない(add_a_feed_data):
