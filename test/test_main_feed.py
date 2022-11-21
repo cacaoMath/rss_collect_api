@@ -101,7 +101,7 @@ def test_post_feed_認証しないとエラーになるか():
     assert response.json() == {'detail': 'Incorrect credentials'}
 
 
-def test_post_feed_データが追加されるか(auth_ok):
+def test_post_feed_データが追加されるか():
     # データが1つ追加される
     response = client.post(
         "/feeds",
@@ -120,7 +120,7 @@ def test_post_feed_データが追加されるか(auth_ok):
     }
 
 
-def test_post_feed_すでに同じURLが存在したら登録できない(auth_ok, add_a_feed_data):
+def test_post_feed_すでに同じURLが存在したら登録できない(add_a_feed_data):
     response = client.post(
         "/feeds",
         json={
@@ -134,7 +134,7 @@ def test_post_feed_すでに同じURLが存在したら登録できない(auth_o
         'detail': 'This RSS feed URL is already registered'}
 
 
-def test_post_feed_descriptionは空でも登録可(auth_ok):
+def test_post_feed_descriptionは空でも登録可():
     # descriptionが空でもいい
     response = client.post(
         "/feeds",
@@ -153,7 +153,7 @@ def test_post_feed_descriptionは空でも登録可(auth_ok):
     }
 
 
-def test_post_feed_URLでないものはvalidation_error(auth_ok):
+def test_post_feed_URLでないものはvalidation_error():
     # URLでないものはvalidation error
     response = client.post(
         "/feeds",
@@ -172,7 +172,7 @@ def test_post_feed_URLでないものはvalidation_error(auth_ok):
     ("https://ac.com", "a"*255, 200),
     ("https://ac.com", "a"*256, 422),
 ])
-def test_post_feed_URLとdescriptionのバリデーション(auth_ok, url, description, status):
+def test_post_feed_URLとdescriptionのバリデーション(url, description, status):
     response = client.post(
         "/feeds",
         json={
@@ -193,14 +193,14 @@ def test_delete_feed_認証しないと削除できない(add_a_feed_data):
     assert response.status_code == 401
 
 
-def test_delete_feed_データを削除できる(auth_ok, add_a_feed_data):
+def test_delete_feed_データを削除できる(add_a_feed_data):
     response = client.delete(
         "/feeds/1", headers={"Authorization": "Basic dXNlcjpwYXNzd29yZA=="})
     assert response.status_code == 200
     assert response.json() == {"message": "delete success"}
 
 
-def test_delete_feed_存在しないデータの削除(auth_ok, add_a_feed_data):
+def test_delete_feed_存在しないデータの削除(add_a_feed_data):
     response = client.delete(
         "/feeds/2", headers={"Authorization": "Basic dXNlcjpwYXNzd29yZA=="})
     assert response.status_code == 200
