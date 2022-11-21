@@ -95,7 +95,7 @@ def test_post_feed_認証しないとエラーになるか():
             "url": "http://abc.com/def.xml",
             "description": "abc rss"
         },
-        headers={"Authorization": "Basic dXNlcjpwYXNzd29yZA=="}
+        headers={"Authorization": "Basic dXNlcjppbmF2bGlk=="}
     )
     assert response.status_code == 401
     assert response.json() == {'detail': 'Incorrect credentials'}
