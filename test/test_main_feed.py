@@ -7,7 +7,7 @@ client = TestClient(app)
 
 
 @pytest.fixture
-def test_add_a_feed(test_db):
+def add_a_feed_data(test_db):
     test_db.add(
         Feed(
             id=1,
@@ -26,7 +26,7 @@ def test_get_feeds_if_feed_is_none():
     assert response.json() == []
 
 
-def test_get_feeds_if_feed_is_one(test_add_a_feed):
+def test_get_feeds_if_feed_is_one(add_a_feed_data):
     response = client.get("/feeds")
     assert response.status_code == 200
     assert response.json() == [{
@@ -71,7 +71,7 @@ def test_get_feeds_if_feed_is_two(test_db):
     }]
 
 
-def test_get_feed_存在するidを指定する(test_add_a_feed):
+def test_get_feed_存在するidを指定する(add_a_feed_data):
     response = client.get("/feeds/1")
     assert response.status_code == 200
     assert response.json() == {
@@ -82,7 +82,7 @@ def test_get_feed_存在するidを指定する(test_add_a_feed):
     }
 
 
-def test_get_feed_存在しないidを指定する(test_add_a_feed):
+def test_get_feed_存在しないidを指定する(add_a_feed_data):
     response = client.get("/feeds/2")
     assert response.status_code == 404
 
@@ -120,7 +120,7 @@ def test_post_feed_データが追加されるか(auth_ok):
     }
 
 
-def test_post_feed_すでに同じURLが存在したら登録できない(auth_ok, test_add_a_feed):
+def test_post_feed_すでに同じURLが存在したら登録できない(auth_ok, add_a_feed_data):
     response = client.post(
         "/feeds",
         json={
@@ -184,23 +184,23 @@ def test_post_feed_URLとdescriptionのバリデーション(auth_ok, url, descr
     assert response.status_code == status
 
 
-def test_update_feed():
+def test_update_feed(add_a_feed_data):
     pass
 
 
-def test_delete_feed_認証しないと削除できない(test_add_a_feed):
+def test_delete_feed_認証しないと削除できない(add_a_feed_data):
     response = client.delete("/feeds/1")
     assert response.status_code == 401
 
 
-def test_delete_feed_データを削除できる(auth_ok, test_add_a_feed):
+def test_delete_feed_データを削除できる(auth_ok, add_a_feed_data):
     response = client.delete(
         "/feeds/1", headers={"Authorization": "Basic dXNlcjpwYXNzd29yZA=="})
     assert response.status_code == 200
     assert response.json() == {"message": "delete success"}
 
 
-def test_delete_feed_存在しないデータの削除(auth_ok, test_add_a_feed):
+def test_delete_feed_存在しないデータの削除(auth_ok, add_a_feed_data):
     response = client.delete(
         "/feeds/2", headers={"Authorization": "Basic dXNlcjpwYXNzd29yZA=="})
     assert response.status_code == 200
