@@ -63,6 +63,10 @@ def create_feed(feed: feed_scm.FeedCreate,
 def update_feed(feed_id: int, feed: feed_scm.FeedUpdate,
                 db: Session = Depends(get_db),
                 cred: bool = Depends(check_credential)):
+    db_feed = feed_crud.get_feeds_by_url(db, feed_url=feed.url)
+    if db_feed:
+        raise HTTPException(
+            status_code=400, detail="This RSS feed URL is already registered")
     feed_crud.update_feed(db, feed_id, feed)
     return {"message": "success"}
 
