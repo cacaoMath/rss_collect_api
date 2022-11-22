@@ -84,7 +84,8 @@ async def read_all_learning_data(skip: int = 0, limit: int = 100,
     return learning_data_crud.get_all_learning_data(db, skip, limit)
 
 
-@app.get("/learning-data/{data_id}", response_model=learning_data_scm.LearningData)
+@app.get("/learning-data/{data_id}",
+         response_model=learning_data_scm.LearningData)
 async def read_learning_data(data_id: int, db: Session = Depends(get_db)):
     return learning_data_crud.get_learning_data(db, data_id)
 
