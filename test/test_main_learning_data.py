@@ -68,3 +68,28 @@ def test_get_a_lerning_deta_指定したデータが返ってくる(add_some_lea
         "word": "hogehoge is fugafuga",
         "category_id": 1,
     }
+
+def test_delete_learning_data_認証しないと削除できない(add_some_learning_data):
+    response = client.delete("/learning-data/1")
+    assert response.status_code == 401
+
+
+def test_delete_learning_data_認証情報が違うと削除できない(add_some_learning_data):
+    response = client.delete(
+        "/learning-data/1",
+        headers={"Authorization": "Basic dXNlcjppbmF2bGlk=="})
+    assert response.status_code == 401
+
+
+def test_delete_learning_data_データを削除できる(add_some_learning_data):
+    response = client.delete(
+        "/learning-data/1",
+        headers={"Authorization": "Basic dXNlcjpwYXNzd29yZA=="})
+    assert response.status_code == 200
+    assert response.json() == {"message": "delete success"}
+
+
+def test_delete_learning_data_存在しないデータの削除(add_some_learning_data):
+    response = client.delete(
+        "/feeds/2", headers={"Authorization": "Basic dXNlcjpwYXNzd29yZA=="})
+    assert response.status_code == 200
