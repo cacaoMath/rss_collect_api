@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session, sessionmaker, scoped_session
 from sqlalchemy.orm.session import close_all_sessions
 
 from app.main import app, get_db
-from app.db.database import Base
+from app.config.database import Base
 
 
 class TestingSession(Session):
@@ -18,7 +18,10 @@ class TestingSession(Session):
 
 @pytest.fixture(scope="function")
 def test_db():
-    engine = create_engine("sqlite:///./test/test.sqlite", connect_args={"check_same_thread": False})
+    engine = create_engine(
+        "sqlite:///./test/test.sqlite",
+        connect_args={"check_same_thread": False}
+    )
     Base.metadata.create_all(bind=engine)
 
     function_scope = uuid4().hex
