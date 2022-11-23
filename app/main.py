@@ -87,7 +87,11 @@ async def read_all_learning_data(skip: int = 0, limit: int = 100,
 @app.get("/learning-data/{data_id}",
          response_model=learning_data_scm.LearningData)
 async def read_learning_data(data_id: int, db: Session = Depends(get_db)):
-    return learning_data_crud.get_learning_data(db, data_id)
+    db_learning_data = learning_data_crud.get_learning_data(db, data_id)
+    if db_learning_data is None:
+        raise HTTPException(
+            status_code=404, detail="That's learning data is not found")
+    return db_learning_data
 
 
 @app.post("/learning-data", response_model=learning_data_scm.LearningData)
