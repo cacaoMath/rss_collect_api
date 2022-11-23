@@ -35,5 +35,9 @@ def update_learning_data(db: Session, data_id: int,
     pass
 
 
-def delete_learning_data():
-    pass
+def delete_learning_data(db: Session, data_id: int):
+    db_feed = db.query(models.LearningData).filter(
+        models.LearningData.id == data_id)
+    db_feed.delete()
+    db.commit()
+    return {"message": "delete success"}

@@ -101,6 +101,13 @@ def create_learning_data(learning_data: learning_data_scm.LearningDataCreate,
     return learning_data_crud.create_learning_data(db, learning_data)
 
 
+@app.delete("/learning-data/{data_id}")
+def delete_learninng_data(data_id: int,
+                          db: Session = Depends(get_db),
+                          cred: bool = Depends(check_credential)):
+    return learning_data_crud.delete_learning_data(db, data_id)
+
+
 @app.get("/calassifier")
 async def read_classifier():
     return {
