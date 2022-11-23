@@ -6,18 +6,6 @@ from app.models.models import LearningData, Category, Feed
 client = TestClient(app)
 
 
-def test_get_learning_data_all():
-    pass
-
-
-def test_get_a_lerning_deta():
-    pass
-
-
-def test_post_learning_data():
-    pass
-
-
 def test_get_classifier():
     response = client.get("/calassifier")
     assert response.status_code == 200
