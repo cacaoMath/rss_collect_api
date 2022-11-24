@@ -2,7 +2,7 @@ import feedparser
 import datetime
 import numpy as np
 
-from app.util.type import FeedItem
+from app.schemas.feed import FeedItem
 from app.ml.classifier import Classifier
 
 
@@ -22,15 +22,17 @@ class Rss():
                     FeedItem(
                         title=entry.title,
                         link=entry.link,
-                        summary=entry.summary,
-                        published=entry.published
+                        summary=self.__get_summary_attributes_of_entry(entry),
+                        published=self.__get_date_attributes_of_entry(entry)
                     )
                 )
         return tmp_list
 
     # 自分が決めたジャンルの記事を集める
     # classifierはfit後を入れる
-    def make_articles(self, feed_list: list[FeedItem], category_value_list: np.ndarray, classifier: Classifier) -> list[FeedItem]:
+    def make_articles(self, feed_list: list[FeedItem],
+                      category_value_list: np.ndarray,
+                      classifier: Classifier) -> list[FeedItem]:
         if not feed_list:
             return []
         title_list = [item.title for item in feed_list]
@@ -41,3 +43,16 @@ class Rss():
 
     def __feedparser(self, url_list: list[str]) -> list:
         return list(map(feedparser.parse, url_list))
+
+    def __get_date_attributes_of_entry(self, entry):
+        if hasattr(entry, "published"):
+            return entry.published
+        elif hasattr(entry, "updated"):
+            return entry.updated
+        else:
+            return None
+
+    def __get_summary_attributes_of_entry(self, entry):
+        if not hasattr(entry, "summary"):
+            return None
+        return entry.summary

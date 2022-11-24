@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
-from app.db.database import Base
+from app.config.database import Base
 
 
 class Feed(Base):
@@ -25,4 +25,4 @@ class Category(Base):
     __tablename__ = "categories"
 
     id = Column(Integer, primary_key=True, index=True)
-    text = Column(String(10), nullable=False)
+    text = Column(String(30), nullable=False)
