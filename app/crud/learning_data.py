@@ -31,9 +31,21 @@ def create_learning_data(db: Session,
 
 
 def update_learning_data(db: Session, data_id: int,
-                         learning_data: learning_data.LearningDataCreate):
-    pass
+                         learning_data: learning_data.LearningDataUpdate):
+    category = get_category(db=db, category=learning_data.category)
+    db_learning_data = db.query(models.LearningData).filter(
+        models.LearningData.id == data_id)
+    db_learning_data.update({
+        models.LearningData.word: learning_data.word,
+        models.LearningData.category_id: category.id,
+    })
+    db.commit()
+    return db_learning_data
 
 
-def delete_learning_data():
-    pass
+def delete_learning_data(db: Session, data_id: int):
+    db_feed = db.query(models.LearningData).filter(
+        models.LearningData.id == data_id)
+    db_feed.delete()
+    db.commit()
+    return {"message": "delete success"}
