@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from app.schemas.category import Category
 
 
 class LearningDataBase(BaseModel):
@@ -18,9 +19,13 @@ class LearningDataCreate(LearningDataBase):
     )
 
 
+class LearningDataUpdate(LearningDataCreate):
+    pass
+
+
 class LearningData(LearningDataBase):
     id: int
-    category_id: int
+    category: Category
 
     class Config:
         orm_mode = True
