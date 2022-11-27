@@ -1,4 +1,4 @@
-#　my rss api
+# RSS colelct API
 ## 概要
 - RSS の記事(内容)をjsonとして返すAPIを目指す
 - 返すRSSの特徴
@@ -11,43 +11,46 @@
 - RSSを厳選する方法
   - ナイーブベイズを使って簡単な機械学習で行う(マシンスペックが許せば将来的には深層学習も使うかもしれない)
 
-## ジャンル推定
-### ナイーブベイズ
-- 簡単に実装するためsklearnにあるものを使う
-  - 精度を高めるために、BOWや正規化などの前処理は行う
-- 参考
-  - Skleanで推定
-    - http://neuro-educator.com/ml7/
-    - https://qiita.com/asakbiz/items/73c552babd3bbca987f9
-    - https://qiita.com/fujin/items/39d450b910bf2be866b5
-  - 前処理
-    - https://note.com/shimakaze_soft/n/nf02b0f8ab0f6
-    - https://qiita.com/kiyuka/items/3de09e313a75248ca029
+## 内容一覧
+- [システム構成](#システム構成)
+- [デプロイ方法](#デプロイ方法)
+- [API 概要](#api) (未実装含む)
+  - [実装されているAPI詳細](https://api.cacaomath.com/redoc)
+- [Model](#model)
+- [Schema](#schema型データ)
+- [参考](#参考)
 
-  - FASTAPI CRUD
-    - https://fastapi.tiangolo.com/ja/tutorial/sql-databases/#__tabbed_1_3
-  - Sqalchemy
-    - https://qiita.com/petitviolet/items/e03c67794c4e335b6706
+## システム構成
+![rss_collect_api drawio](https://user-images.githubusercontent.com/53263220/204059826-0513a4fe-d668-45c3-b8dc-7f753f2c379e.svg)
 
-### 形態素分析
-  - 比較的新言語に対応していると思われる以下の辞書を使用する。Mecabなどは手順通りに入れる
-    - https://github.com/neologd/mecab-ipadic-neologd/blob/master/README.ja.md
+- frp: https://github.com/fatedier/frp
+  - ポート解放ができないローカルのサーバ公開のために使用
+- DB: Prostgres
 
-### rss_feed
-- feedparserを使う
-  - https://pythonhosted.org/feedparser/
 
-## test
-- pytestを使用
-- 参考
-  - dbのfixture
-    - https://note.com/navitime_tech/n/n5286eecf5a7c
+## デプロイ方法
+- デプロイするサーバにmecabの辞書`mecab-ipadic-NEologd`をインストールする
+  - 方法は公式に従う: https://github.com/neologd/mecab-ipadic-neologd/blob/master/README.ja.md
+  - `$ echo `mecab-config --dicdir`"/mecab-ipadic-neologd"`で辞書が確認できればOK
+
+- checkoutしてくる
+```
+$ git clone git@github.com:cacaoMath/rss_collect_api.git
+$ git checkout ${デプロイするバージョンタグ名}
+```
+- .envファイルに必要な値を入力する
+  - `.env.sample`を例にする
+- deploy.shを叩く
+  - deploy.shで必要なDockerfileのビルドや辞書のコピーなどが行われる。
+- deploy完了、localhost:8000で接続できるか確認する
+
 
 ## API
 - `/docs` or `/redoc`で詳細の確認が可能
 - POST,UPDATE,DELETEの処理はBASIC認証が必要
+  - `/rss`は例外とする
 ### `feeds`
-- `/feeds/` : GET
+- `/feeds` : GET
   - 登録しているRSS feed URLの一覧表示
 - `/feeds/{feed_id}` : GET
   - {feed_id}のRSS feed URLの表示
@@ -55,11 +58,11 @@
   - {feed_id}のRSS feed URLの更新
 - `/feeds/{feed_id}` : DELETE
   - {feed_id}のRSS feed URLの削除
-- `/feeds/` : POST
+- `/feeds` : POST
   - RSS feed URLの登録
 
 ### `learning-data`
-- `/learning-data/` : GET
+- `/learning-data` : GET
   - 学習データの一覧表示
 - `/learning-data/{data_id}` : GET
   - {data_id}の学習データを表示
@@ -67,18 +70,27 @@
   - {data_id}の学習データを更新
 - `/learning-data/{data_id}` : DLETE
   - {data_id}の学習データを削除
-- `/learning-data/` : POST
+- `/learning-data` : POST
   - 学習データの追加
 
+### `categories`
+- `/categories` : GET
+  - 登録されているカテゴリ(ジャンル)の一覧表示
+
 ### `classifier`
-- `/classifier` : GET　（モデルの仕様で未実装）
-  - モデル更新日出力
+- `/classifier` : GET　（学習モデルが保存できる場合に実装）
+  - 機械学習モデル更新日出力
 - `/classifier/predict` : POST
   - テキストのジャンルを推定
 
 ### `rss`
-- `/rss/` : POST
+- `/rss` : POST
   - 分類器を使用して、POSTしたジャンルで集められた記事のタイトル、日付、URLなどをJSONで返す
+  - RequesBody: JSON
+    ```
+    {"categories": ["string1", "string2", ...]}
+    ```
+    - "categories"にはGET `/categories`得られる値から、得たい記事のジャンルをlistで入れる。
 
 ## Model
 ### feeds
@@ -103,14 +115,42 @@
 ### Category
 - category: str
   - valid
-    - length: 10
+    - length: 30
     - null: false
-    - 使用できる文字: a-z,A-Z,数字,_のみとする(未実装)
+    - 使用できる文字: a-z,A-Z,0-9,-
 
-## デプロイ方法
-- デプロイするサーバにmecabの辞書`mecab-ipadic-NEologd`をインストールする
-  - 方法は公式に従う: https://github.com/neologd/mecab-ipadic-neologd/blob/master/README.ja.md
-  - `$ echo `mecab-config --dicdir`"/mecab-ipadic-neologd"`で辞書が確認できればOK
-- deploy.shを叩く
-  - deploy.shで必要なDockerfileのビルドや辞書のコピーなどが行われる。
-- deploy完了、localhost:8000で接続できるか確認する
+## Schema(型データ)
+- [docsのschemas](https://api.cacaomath.com/docs)を参照
+
+## 参考
+### ジャンル推定
+#### ナイーブベイズ
+- 簡単に実装するためsklearnにあるものを使う
+  - 精度を高めるために、BOWや正規化などの前処理は行う
+- 参考
+  - Skleanで推定
+    - http://neuro-educator.com/ml7/
+    - https://qiita.com/asakbiz/items/73c552babd3bbca987f9
+    - https://qiita.com/fujin/items/39d450b910bf2be866b5
+  - 前処理
+    - https://note.com/shimakaze_soft/n/nf02b0f8ab0f6
+    - https://qiita.com/kiyuka/items/3de09e313a75248ca029
+
+  - FASTAPI CRUD
+    - https://fastapi.tiangolo.com/ja/tutorial/sql-databases/#__tabbed_1_3
+  - Sqalchemy
+    - https://qiita.com/petitviolet/items/e03c67794c4e335b6706
+
+#### 形態素分析
+  - 比較的新言語に対応していると思われる以下の辞書を使用する。Mecabなどは手順通りに入れる
+    - https://github.com/neologd/mecab-ipadic-neologd/blob/master/README.ja.md
+
+### rss_feed
+- feedparserを使う
+  - https://pythonhosted.org/feedparser/
+
+### Test
+- pytestを使用
+- 参考
+  - dbのfixture
+    - https://note.com/navitime_tech/n/n5286eecf5a7c
