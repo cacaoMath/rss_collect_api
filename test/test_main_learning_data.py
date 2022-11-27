@@ -39,17 +39,26 @@ def test_get_learning_data_all_全てのデータを返す(add_some_learning_dat
         {
             "id": 1,
             "word": "hogehoge is fugafuga",
-                    "category_id": 1
+            "category": {
+                "id": 1,
+                "text": "fugafuga"
+            }
         },
         {
             "id": 2,
             "word": "hogehoge was fugario",
-            "category_id": 2
+            "category": {
+                "id": 2,
+                "text": "fugarion"
+            }
         },
         {
             "id": 3,
             "word": "hogehoge has fugashi",
-            "category_id": 3
+            "category": {
+                "id": 3,
+                "text": "fugashin"
+            }
         }
     ]
 
@@ -66,7 +75,10 @@ def test_get_a_lerning_deta_指定したデータが返ってくる(add_some_lea
     assert response.json() == {
         "id": 1,
         "word": "hogehoge is fugafuga",
-        "category_id": 1,
+        "category": {
+            "id": 1,
+            "text": "fugafuga"
+        }
     }
 
 
@@ -98,7 +110,10 @@ def test_post_learning_data_データが追加されるか(test_db):
     assert response.json() == {
         "word": "horerin",
         "id": 1,
-        "category_id": 1
+        "category": {
+            "id": 1,
+            "text": "hogehoge"
+        }
     }
     first_category = test_db.query(Category).filter(
         Category.id == 1).first()
@@ -118,7 +133,7 @@ def test_post_learning_data_すでに同じCategoryが存在したら同じカ�
     assert response.status_code == 200
     category_fugafuga = test_db.query(Category).filter(
         Category.text == "fugafuga").first()
-    assert response.json()["category_id"] == category_fugafuga.id
+    assert response.json()["category"]["id"] == category_fugafuga.id
 
 
 def test_post_learning_data_同じCategoryが存在しない場合新しいカテゴリを追加する(
@@ -181,6 +196,12 @@ def test_post_learning_data_wordとcategoryの文字数のバリデーション(
         headers={"Authorization": "Basic dXNlcjpwYXNzd29yZA=="}
     )
     assert response.status_code == status
+
+
+def test_update_learning_data():
+    pass
+
+
 def test_delete_learning_data_認証しないと削除できない(add_some_learning_data):
     response = client.delete("/learning-data/1")
     assert response.status_code == 401
