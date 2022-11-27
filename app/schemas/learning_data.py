@@ -20,7 +20,8 @@ class LearningDataCreate(LearningDataBase):
 
 
 class LearningDataUpdate(LearningDataCreate):
-    pass
+    class Config:
+        orm_mode = True
 
 
 class LearningData(LearningDataBase):

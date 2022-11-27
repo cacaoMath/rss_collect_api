@@ -101,6 +101,16 @@ def create_learning_data(learning_data: learning_data_scm.LearningDataCreate,
     return learning_data_crud.create_learning_data(db, learning_data)
 
 
+@app.put("/learning-data/{data_id}")
+def update_learning_date(data_id: int,
+                         learning_data: learning_data_scm.LearningDataUpdate,
+                         db: Session = Depends(get_db),
+                         cred: bool = Depends(check_credential)):
+    learning_data_crud.update_learning_data(
+        db=db, data_id=data_id, learning_data=learning_data)
+    return {"message": "success"}
+
+
 @app.delete("/learning-data/{data_id}")
 def delete_learninng_data(data_id: int,
                           db: Session = Depends(get_db),
