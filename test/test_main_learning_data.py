@@ -322,15 +322,25 @@ def test_delete_learning_data_認証情報が違うと削除できない(add_som
     assert response.status_code == 401
 
 
-def test_delete_learning_data_データを削除できる(add_some_learning_data):
+def test_delete_learning_data_データを削除できる(test_db, add_some_learning_data):
+    pre_delete_count = test_db.query(LearningData).count()
     response = client.delete(
         "/learning-data/1",
         headers={"Authorization": "Basic dXNlcjpwYXNzd29yZA=="})
+    after_delete_count = test_db.query(LearningData).count()
     assert response.status_code == 200
     assert response.json() == {"message": "delete success"}
+    assert (after_delete_count - pre_delete_count) == -1
+    db_data = test_db.query(LearningData).filter(LearningData.id == 1).first()
+    assert db_data is None
 
 
-def test_delete_learning_data_存在しないデータの削除(add_some_learning_data):
+def test_delete_learning_data_存在しないデータの削除(test_db, add_some_learning_data):
+    pre_delete_count = test_db.query(LearningData).count()
     response = client.delete(
         "/feeds/2", headers={"Authorization": "Basic dXNlcjpwYXNzd29yZA=="})
+    after_delete_count = test_db.query(LearningData).count()
     assert response.status_code == 200
+    assert (after_delete_count - pre_delete_count) == 0
+    db_data = test_db.query(LearningData).filter(LearningData.id == 1).first()
+    assert db_data is not None
