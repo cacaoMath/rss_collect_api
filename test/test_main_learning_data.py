@@ -198,8 +198,116 @@ def test_post_learning_data_wordとcategoryの文字数のバリデーション(
     assert response.status_code == status
 
 
-def test_update_learning_data():
-    pass
+def test_update_learning_data_認証情報が違うと更新できない():
+    response = client.put(
+        "/learning-data/1",
+        json={
+            "word": "word",
+            "category": "category"
+        },
+        headers={"Authorization": "Basic dXNlcjppbmF2bGlk=="})
+    assert response.status_code == 401
+
+
+def test_update_learning_data_データが更新される(test_db, add_some_learning_data):
+    updated_data = test_db.query(LearningData).filter(
+        LearningData.id == 1).first()
+    response = client.put(
+        "/learning-data/1",
+        json={
+            "word": "updated word",
+            "category": "updated-category"
+        },
+        headers={"Authorization": "Basic dXNlcjpwYXNzd29yZA=="})
+    assert response.status_code == 200
+    assert response.json() == {"message": "success"}
+    updated_data = test_db.query(LearningData).filter(
+        LearningData.id == 1).first()
+    assert updated_data.word == "updated word"
+    assert updated_data.category.text == "updated-category"
+
+
+def test_update_learning_data_すでに同じCategoryが存在したら同じカテゴリidになる(
+        test_db, add_some_learning_data):
+    pre_post_category_count = test_db.query(Category).count()
+    response = client.put(
+        "/learning-data/1",
+        json={
+            "word": "updated word",
+            "category": "fugafuga"
+        },
+        headers={"Authorization": "Basic dXNlcjpwYXNzd29yZA=="}
+    )
+    assert response.status_code == 200
+    after_post_category_count = test_db.query(Category).count()
+    assert (after_post_category_count - pre_post_category_count) == 0
+    updated_data = test_db.query(LearningData).filter(
+        LearningData.id == 1).first()
+    assert updated_data.word == "updated word"
+    assert updated_data.category.text == "fugafuga"
+
+
+def test_update_learning_data_同じCategoryが存在しない場合新しいカテゴリを追加する(
+        test_db, add_some_learning_data):
+    pre_post_category_count = test_db.query(Category).count()
+    response = client.put(
+        "/learning-data/1",
+        json={
+            "word": "updated word",
+            "category": "updated-category"
+        },
+        headers={"Authorization": "Basic dXNlcjpwYXNzd29yZA=="}
+    )
+    assert response.status_code == 200
+    after_post_category_count = test_db.query(Category).count()
+    assert (after_post_category_count - pre_post_category_count) == 1
+    piyopiyo = test_db.query(Category).filter(
+        Category.text == "updated-category").first()
+    assert piyopiyo is not None
+
+
+@pytest.mark.parametrize(("category", "status"), [
+    ("category", 200), ("category-is-work", 200),
+    ("category_is_not_work", 422), ("category is not work", 422),
+    ("category!is!not!work", 422), ("category@is@not@work", 422),
+    ("category~is~not~work", 422), ("category(", 422),
+    ("category)", 422), ("categoryああ", 422), ("category\"", 422),
+    ("category#", 422), ("category$", 422), ("category%", 422),
+    ("category&", 422), ("category'", 422), ("ワーク", 422),
+])
+def test_update_learning_data_categoryの文字種バリデーション(category, status):
+    response = client.put(
+        "/learning-data/1",
+        json={
+            "word": "updated word",
+            "category": category
+        },
+        headers={"Authorization": "Basic dXNlcjpwYXNzd29yZA=="}
+    )
+    assert response.status_code == status, "categoryはa-z,A-Z,0-9,-のみ"
+
+
+@pytest.mark.parametrize(("word", "category", "status"), [
+    ("a"*255, "category", 200),
+    ("a"*1, "category", 200),
+    ("word id word", "c"*2, 200),
+    ("word id word", "c"*30, 200),
+    ("", "category", 422),
+    ("a"*256, "category", 422),
+    ("word id word", "", 422),
+    ("word id word", "c"*31, 422),
+])
+def test_update_learning_data_wordとcategoryの文字数のバリデーション(
+        word, category, status):
+    response = client.put(
+        "/learning-data/1",
+        json={
+            "word": word,
+            "category": category
+        },
+        headers={"Authorization": "Basic dXNlcjpwYXNzd29yZA=="}
+    )
+    assert response.status_code == status
 
 
 def test_delete_learning_data_認証しないと削除できない(add_some_learning_data):
