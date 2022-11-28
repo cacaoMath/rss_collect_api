@@ -13,6 +13,10 @@ def get_category(db: Session, category: str):
     )
 
 
+def get_categories(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.Category).offset(skip).limit(limit).all()
+
+
 def create_category(db: Session, category: category.Category):
     db_category = models.Category(text=category)
     db.add(db_category)
