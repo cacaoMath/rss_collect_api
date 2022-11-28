@@ -4,11 +4,13 @@ from sqlalchemy.orm import Session
 from app.crud import (
     feed as feed_crud,
     learning_data as learning_data_crud,
+    category as category_crud,
     rss as rss_crud
 )
 from app.schemas import (
     feed as feed_scm,
     learning_data as learning_data_scm,
+    category as category_scm,
     other as other_scm
 )
 from app.models import models
@@ -116,6 +118,12 @@ def delete_learninng_data(data_id: int,
                           db: Session = Depends(get_db),
                           cred: bool = Depends(check_credential)):
     return learning_data_crud.delete_learning_data(db, data_id)
+
+
+@app.get("/categories", response_model=list[category_scm.Category])
+def read_all_category(skip: int = 0, limit: int = 100,
+                      db: Session = Depends(get_db)):
+    return category_crud.get_categories(db, skip, limit)
 
 
 @app.get("/calassifier")
