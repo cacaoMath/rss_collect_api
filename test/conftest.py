@@ -16,7 +16,7 @@ class TestingSession(Session):
         self.expire_all()
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="function", autouse=True)
 def test_db():
     engine = create_engine(
         "sqlite:///./test/test.sqlite",
