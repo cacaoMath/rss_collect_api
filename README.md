@@ -20,7 +20,7 @@
 - [Schema](#schema型データ)
 - [参考](#参考)
 
-## システム構成
+## システム構成例
 ![rss_collect_api drawio](https://user-images.githubusercontent.com/53263220/204059826-0513a4fe-d668-45c3-b8dc-7f753f2c379e.svg)
 
 - frp: https://github.com/fatedier/frp
@@ -42,8 +42,16 @@ $ git checkout ${デプロイするバージョンタグ名}
   - `.env.sample`を例にする
 - deploy.shを叩く
   - deploy.shで必要なDockerfileのビルドや辞書のコピーなどが行われる。
-- deploy完了、localhost:8000で接続できるか確認する
+- deploy完了、localhost:8000などで接続できるか確認する
 
+## 開発環境構築
+- pipenvでパッケージ管理しているためインストールしておく
+- `pipenv install --dev`で開発に必要なパッケージ込みでインストール可能
+- 内部処理に使用してる`mecab-ipadic-NEologd`は別で要インストール
+  - 方法は公式に従う: https://github.com/neologd/mecab-ipadic-neologd/blob/master/README.ja.md
+- DBはDockerで立ち上げられる
+  - `cp docker-compose.yml.sample docker-compose.yml`の後にdocker-composeで立ち上げる
+- `.env`にDB情報などの記入が必要なので`.env.sample`を参考に記入し作成する。
 
 ## API
 - `/docs` or `/redoc`で詳細の確認が可能
@@ -91,6 +99,10 @@ $ git checkout ${デプロイするバージョンタグ名}
     {"categories": ["string1", "string2", ...]}
     ```
     - "categories"にはGET `/categories`得られる値から、得たい記事のジャンルをlistで入れる。
+#### `/rss`内部処理
+![rss](https://user-images.githubusercontent.com/53263220/204524031-ae49e9d1-ee73-4bfa-b81d-b01fece926f4.svg)
+
+
 
 ## Model
 ### feeds
