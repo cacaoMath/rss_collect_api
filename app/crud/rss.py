@@ -15,7 +15,7 @@ def return_rss_articles(db: Session, collect_categories: list[str]):
         models.Category.text.in_(collect_categories)).all()
     rss = Rss()
     feed_url_list = db.query(models.Feed.url).all()
-    feed_url_list = np.array(feed_url_list)[:, 0].tolist()
+    feed_url_list = [elm[0] for elm in feed_url_list]
     feed_list = rss.get_feed(feed_url_list=feed_url_list)
     return rss.make_articles(
         feed_list=feed_list,
