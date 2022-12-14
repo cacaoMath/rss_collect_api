@@ -11,19 +11,14 @@ def return_rss_articles(db: Session, collect_categories: list[str]):
     dataset = make_dataset_from_db(db)
     classifier = Classifier()
     classifier.train(dataset["word"], dataset["category_id"])
-    category = db.query(models.Category).all()
-    category = np.array([[int(elm.id), str(elm.text)] for elm in category])
-    # 指定したカテゴリの値分だけ残すようにマスキング
-    mask = np.isin(category[:, 1], collect_categories)
-    # numpy strのndarrayになっているのでintにする
-    collect_value_list = category[:, 0][mask].astype(np.int64)
+    category_value_list = db.query(models.Category.id).filter(
+        models.Category.text.in_(collect_categories)).all()
     rss = Rss()
-    feed_url_list = db.query(models.Feed.url).all()
-    feed_url_list = np.array(feed_url_list)[:, 0].tolist()
+    feed_url_list = [elm[0] for elm in db.query(models.Feed.url).all()]
     feed_list = rss.get_feed(feed_url_list=feed_url_list)
     return rss.make_articles(
         feed_list=feed_list,
-        category_value_list=collect_value_list,
+        category_value_list=np.array([c[0] for c in category_value_list]),
         classifier=classifier
     )
 
