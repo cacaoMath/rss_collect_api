@@ -1,12 +1,12 @@
-FROM python:3.10.8-slim
+FROM python3.10.8_with_mecab:latest
 
-COPY ./img_setup.sh /img_setup.sh
 COPY ./Pipfile.lock /Pipfile.lock
 COPY ./app /app
-COPY ./dic /dic
 COPY ./.env /.env
 
-RUN ["/img_setup.sh"]
+RUN pip install --upgrade pip \
+    && pip install pipenv \
+    && pipenv sync
 
 EXPOSE 8000
 
