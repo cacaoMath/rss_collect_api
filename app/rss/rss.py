@@ -1,5 +1,4 @@
 import feedparser
-import datetime
 import numpy as np
 
 from app.schemas.feed import FeedItem
@@ -7,9 +6,6 @@ from app.ml.classifier import Classifier
 
 
 class Rss():
-    def __init__(self):
-        self.today = datetime.date.today()
-
     # urlからfeedの内容を取ってくる、取ってきたリストは結合して返す
     def get_feed(self, feed_url_list: list[str]) -> list[FeedItem]:
         if not feed_url_list:
