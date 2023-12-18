@@ -1,8 +1,13 @@
 import feedparser
 import numpy as np
+from logging import getLogger, StreamHandler
 
 from app.schemas.feed import FeedItem
 from app.ml.classifier import Classifier
+
+logger = getLogger(__name__)
+logger.addHandler(StreamHandler())
+logger.setLevel("INFO")      
 
 
 class Rss():
