@@ -1,5 +1,6 @@
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.crud import (
     feed as feed_crud,
@@ -13,6 +14,9 @@ from app.schemas import (
     category as category_scm,
     other as other_scm
 )
+from app.config.env import (
+    ALLOW_ORIGIN
+)
 from app.models import models
 from app.config import database
 from app.ml.classifier import Classifier
@@ -24,6 +28,13 @@ models.Base.metadata.create_all(bind=database.engine)
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[ALLOW_ORIGIN],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 
 # Dependency
 def get_db():
