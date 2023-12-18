@@ -5,7 +5,7 @@ on:
     branches:
       - dev*
       - main
-      - issues*
+      - issues/*
 
 jobs:
   lint:
