@@ -15,7 +15,7 @@ class Rss():
     def get_feed(self, feed_url_list: list[str]) -> list[FeedItem]:
         if not feed_url_list:
             return []
-        feed_list = self.__feedparser(feed_url_list)
+        feed_list = self.__feedsparser(feed_url_list)
         tmp_list = []
         for feed in feed_list:
             for entry in feed.entries:
@@ -42,8 +42,17 @@ class Rss():
         select_feed_list = np.array(feed_list)[pred_mask].tolist()
         return list(map(lambda x: x, select_feed_list))
 
-    def __feedparser(self, url_list: list[str]) -> list:
-        return list(map(feedparser.parse, url_list))
+    def __feedsparser(self, url_list: list[str]) -> list:
+        return list(map(self.__valid_url_feedparser, url_list))
+
+    # 無効なURLが来ても、値を返せるようにする
+    def __valid_url_feedparser(self, url: str):
+        try:
+            feed = feedparser.parse(url)
+        except Exception as e:
+            logger.info(f"this url : {url} is invalid.")
+            feed = []
+        return feed
 
     def __get_date_attributes_of_entry(self, entry):
         if hasattr(entry, "published"):
