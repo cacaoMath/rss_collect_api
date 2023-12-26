@@ -15,6 +15,7 @@ feedparser = "*"
 python-dotenv = "*"
 psycopg2-binary = "*"
 httpx = "*"
+minio = "*"
 
 [dev-packages]
 pytest-mock = "*"

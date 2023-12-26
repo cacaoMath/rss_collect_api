@@ -14,7 +14,28 @@ def return_rss_articles(db: Session, collect_categories: list[str]):
     category_value_list = db.query(models.Category.id).filter(
         models.Category.text.in_(collect_categories)).all()
     rss = Rss()
-    feed_url_list = [elm[0] for elm in db.query(models.Feed.url).all()]
+    feed_url_list = [
+        "http://127.0.0.1:9000/feeds/feeds/002.xml",
+        "http://127.0.0.1:9000/feeds/feeds/003.xml",
+        "http://127.0.0.1:9000/feeds/feeds/001.xml",
+        "http://127.0.0.1:9000/feeds/feeds/004.xml",
+        "http://127.0.0.1:9000/feeds/feeds/005.xml",
+        "http://127.0.0.1:9000/feeds/feeds/006.xml",
+        "http://127.0.0.1:9000/feeds/feeds/007.xml",
+        "http://127.0.0.1:9000/feeds/feeds/008.xml",
+        "http://127.0.0.1:9000/feeds/feeds/009.xml",
+        "http://127.0.0.1:9000/feeds/feeds/010.xml",
+        "http://127.0.0.1:9000/feeds/feeds/011.xml",
+        "http://127.0.0.1:9000/feeds/feeds/012.xml",
+        "http://127.0.0.1:9000/feeds/feeds/013.xml",
+        "http://127.0.0.1:9000/feeds/feeds/014.xml",
+        "http://127.0.0.1:9000/feeds/feeds/015.xml",
+        "http://127.0.0.1:9000/feeds/feeds/016.xml",
+        "http://127.0.0.1:9000/feeds/feeds/017.xml",
+        "http://127.0.0.1:9000/feeds/feeds/018.xml",
+        "http://127.0.0.1:9000/feeds/feeds/019.xml"
+    ]
+    # feed_url_list = [elm[0] for elm in db.query(models.Feed.url).all()]
     feed_list = rss.get_feed(feed_url_list=feed_url_list)
     return rss.make_articles(
         feed_list=feed_list,

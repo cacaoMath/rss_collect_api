@@ -3,13 +3,15 @@ import numpy as np
 
 from app.schemas.feed import FeedItem
 from app.ml.classifier import Classifier
-
+import time
 
 class Rss():
     # urlからfeedの内容を取ってくる、取ってきたリストは結合して返す
     def get_feed(self, feed_url_list: list[str]) -> list[FeedItem]:
         if not feed_url_list:
             return []
+        start = time.time()
+        print(feed_url_list)
         feed_list = self.__feedparser(feed_url_list)
         tmp_list = []
         for feed in feed_list:
@@ -22,6 +24,8 @@ class Rss():
                         published=self.__get_date_attributes_of_entry(entry)
                     )
                 )
+        end = time.time()
+        print("time", end-start)
         return tmp_list
 
     # 自分が決めたジャンルの記事を集める

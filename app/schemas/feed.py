@@ -16,7 +16,7 @@ class FeedCreate(FeedBase):
         title="RSS feed URL",
         max_length=255,
         # https://uibakery.io/regex-library/url-regex-python 参考
-        regex="^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$"  # noqa: E501
+        pattern="^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$"  # noqa: E501
     )
 
 
